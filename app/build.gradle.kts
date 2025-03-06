@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.practice.fixkan"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.practice.fixkan"
@@ -60,6 +60,9 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.compose)
+//    implementation(libs.litert.support.api)
+//    implementation(libs.litert)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -75,5 +78,10 @@ dependencies {
     implementation(libs.firebase.ml.modeldownloader)
 
     // Also add the dependency for the TensorFlow Lite library and specify its version
-    implementation(libs.tensorflow.lite)
+//    implementation(libs.tensorflow.lite)
+
+    implementation (libs.coil.compose)
+    implementation (libs.tensorflow.lite)
+    implementation (libs.tensorflow.lite.task.vision)
+    implementation (libs.tensorflow.lite.support)
 }
