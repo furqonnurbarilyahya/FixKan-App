@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.practice.fixkan.navigation.NavigationItem
 import com.practice.fixkan.navigation.Screen
 import com.practice.fixkan.screen.HomeScreen
+import com.practice.fixkan.screen.ListReport.ListReportScreen
 import com.practice.fixkan.ui.theme.FixKanTheme
 
 class MainActivity : ComponentActivity() {
@@ -43,6 +45,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun FixKanApp(navController: NavHostController = rememberNavController()) {
 
+    val context = LocalContext.current
+
     Scaffold (
         bottomBar = {
             BottomBar(navController)
@@ -56,6 +60,9 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
         ) {
             composable(Screen.Home.route) {
                 HomeScreen()
+            }
+            composable(Screen.Report.route) {
+                ListReportScreen(context)
             }
         }
     }

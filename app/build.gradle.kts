@@ -84,4 +84,9 @@ dependencies {
     implementation (libs.tensorflow.lite)
     implementation (libs.tensorflow.lite.task.vision)
     implementation (libs.tensorflow.lite.support)
+
+    //Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
 }
