@@ -1,5 +1,6 @@
 package com.practice.fixkan
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,8 +28,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.practice.fixkan.navigation.NavigationItem
 import com.practice.fixkan.navigation.Screen
+import com.practice.fixkan.screen.ClassificationScreen
 import com.practice.fixkan.screen.HomeScreen
 import com.practice.fixkan.screen.ListReport.ListReportScreen
+import com.practice.fixkan.screen.ResultClassificationScreen
 import com.practice.fixkan.ui.theme.FixKanTheme
 
 class MainActivity : ComponentActivity() {
@@ -47,9 +50,16 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
 
     val context = LocalContext.current
 
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val showBottomNav = currentRoute in listOf("home", "report", "profile")
+
     Scaffold (
         bottomBar = {
+            if (showBottomNav) {
             BottomBar(navController)
+            }
         },
         modifier = Modifier.fillMaxSize()
     ) { innerpadding ->
@@ -59,10 +69,26 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
             modifier = Modifier.padding(innerpadding)
         ) {
             composable(Screen.Home.route) {
-                HomeScreen()
+                HomeScreen(navController = navController)
             }
             composable(Screen.Report.route) {
                 ListReportScreen(context)
+            }
+            composable(Screen.Classification.route) {
+                ClassificationScreen(navController = navController)
+            }
+//            composable(Screen.ResultClassification.route) {
+//                ResultClassificationScreen()
+//            }
+//            composable("result_classification/{imageUri}/{result}") { backstackEntry ->
+//                val imageUri = backstackEntry.arguments?.getString("imageuUri")
+//                val result = backstackEntry.arguments?.getString("result") ?: "Hasil Tidak Tersedia"
+//                ResultClassificationScreen(imageUri, result)
+//            }
+            composable(Screen.ResultClassification.route) { backstackEntry ->
+                val imageUri = backstackEntry.arguments?.getString("imageUri")
+                val result = backstackEntry.arguments?.getString("result") ?: "Hasil Tidak Tersedia"
+                ResultClassificationScreen(Uri.decode(imageUri), Uri.decode(result))
             }
         }
     }
