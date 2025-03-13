@@ -88,7 +88,7 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
             composable(Screen.ResultClassification.route) { backstackEntry ->
                 val imageUri = backstackEntry.arguments?.getString("imageUri")
                 val result = backstackEntry.arguments?.getString("result") ?: "Hasil Tidak Tersedia"
-                ResultClassificationScreen(Uri.decode(imageUri), Uri.decode(result))
+                ResultClassificationScreen(Uri.decode(imageUri), Uri.decode(result), navController = navController)
             }
         }
     }

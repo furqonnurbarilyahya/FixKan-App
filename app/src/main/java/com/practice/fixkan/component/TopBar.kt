@@ -22,16 +22,18 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.practice.fixkan.ui.theme.FixKanTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(title: String) {
+fun TopBar(title: String, navController: NavController) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(Color(android.graphics.Color.parseColor("#276561"))),
         navigationIcon = {
             IconButton(
-                onClick = {}
+                onClick = {navController.popBackStack()}
             ) {
                 Icon(
                     modifier = Modifier.size(35.dp),
@@ -57,6 +59,6 @@ fun TopBar(title: String) {
 @Composable
 private fun TopBarPreview() {
     FixKanTheme {
-        TopBar(title = "Buat Laporan")
+        TopBar(title = "Buat Laporan", navController = rememberNavController())
     }
 }

@@ -29,7 +29,7 @@ class ImageClassificationHelper(private val context: Context) {
                 val modelFile = mymodel.file
                 if (modelFile != null) {
                     tfLite = Interpreter(modelFile)
-                    Toast.makeText(context, "Model Berhasil Diunduh!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Model AI Siap Digunakan!", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(context, "Model Gagal Diunduh!", Toast.LENGTH_SHORT).show()
                 }
@@ -40,7 +40,7 @@ class ImageClassificationHelper(private val context: Context) {
             }
     }
 
-    fun preprocessImage(bitmap: Bitmap): ByteBuffer {
+    private fun preprocessImage(bitmap: Bitmap): ByteBuffer {
         val inputSize = 224
         val resizedBitmap = Bitmap.createScaledBitmap(bitmap, inputSize, inputSize, true)
 

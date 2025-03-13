@@ -52,6 +52,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.practice.fixkan.R
@@ -62,7 +63,7 @@ import com.practice.fixkan.ui.theme.FixKanTheme
 import kotlinx.coroutines.delay
 
 @Composable
-fun ClassificationScreen(navController: NavHostController) {
+fun ClassificationScreen(navController: NavController) {
     
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
@@ -138,7 +139,7 @@ fun ClassificationScreen(navController: NavHostController) {
     } else {
         Scaffold(
             topBar = {
-                TopBar(title = "Buat Laporan")
+                TopBar(title = "Buat Laporan", navController = navController)
             }
         ) {
             Column(
@@ -279,6 +280,11 @@ fun ClassificationScreen(navController: NavHostController) {
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(android.graphics.Color.parseColor("#276561"))
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 6.dp,
+                        pressedElevation = 4.dp,
+                        disabledElevation = 0.dp
                     )
                 ) {
                     Text(
