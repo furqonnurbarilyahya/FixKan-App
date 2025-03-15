@@ -144,7 +144,9 @@ fun ClassificationScreen(navController: NavController) {
         ) {
             Column(
                 modifier = Modifier
+                    .fillMaxSize()
                     .padding(it)
+                    .padding(12.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -160,8 +162,8 @@ fun ClassificationScreen(navController: NavController) {
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
-                    text = "Ambil atau pilih foto infrastruktur atau lingkungan yang rusak. AI kami akan mengklasifikasikan jenis kerusakan secara otomatis!",
+                        .padding(horizontal = 10.dp),
+                    text = "Unggah foto infrastruktur atau lingkungan yang rusak. AI kami akan mengklasifikasikan jenis kerusakan secara otomatis!",
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
                 )
@@ -269,6 +271,9 @@ fun ClassificationScreen(navController: NavController) {
                     fontSize = 16.sp,
                     textAlign = TextAlign.Start
                 )
+
+                Spacer(Modifier.weight(1f))
+
                 Button(
                     onClick = {
                         showDialog = true
@@ -276,7 +281,8 @@ fun ClassificationScreen(navController: NavController) {
                     enabled = imageUri != null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp),
+                        .padding(horizontal = 30.dp)
+                        .height(45.dp),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(android.graphics.Color.parseColor("#276561"))
@@ -284,12 +290,11 @@ fun ClassificationScreen(navController: NavController) {
                     elevation = ButtonDefaults.buttonElevation(
                         defaultElevation = 6.dp,
                         pressedElevation = 4.dp,
-                        disabledElevation = 0.dp
                     )
                 ) {
                     Text(
                         text = "Analisis Foto",
-                        fontSize = 18.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                 }

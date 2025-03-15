@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services")
+    id("kotlinx-serialization")
 }
 
 android {
@@ -61,6 +62,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.runtime.livedata)
 //    implementation(libs.litert.support.api)
 //    implementation(libs.litert)
     testImplementation(libs.junit)
@@ -92,4 +94,7 @@ dependencies {
 
     // Google Play Services - Location
     implementation (libs.play.services.location)
+
+
+    implementation(libs.kotlinx.serialization.json)
 }

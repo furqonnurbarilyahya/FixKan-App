@@ -19,11 +19,105 @@ import com.google.android.gms.location.Priority
 import java.io.IOException
 import java.util.Locale
 
+//fun getAddressFromLocation(
+//    latitude: Double,
+//    longitude: Double,
+//    context: Context,
+//    onAddressFound: (String) -> Unit
+//) {
+//    val geocoder = Geocoder(context, Locale.getDefault())
+//
+//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//        geocoder.getFromLocation(latitude, longitude, 1, object : Geocoder.GeocodeListener {
+//            override fun onGeocode(addresses: MutableList<Address>) {
+//                if (addresses.isNotEmpty()) {
+//                    val address = addresses[0]
+//                    val result = "${address.adminArea}, ${address.subAdminArea}, ${address.locality}, ${address.subLocality}"
+//                    Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: $result")
+//                    onAddressFound(result)
+//                } else {
+//                    Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: Not Found")
+//                    onAddressFound("Alamat tidak ditemukan")
+//                }
+//            }
+//
+//            override fun onError(errorMessage: String?) {
+//                Log.e("LocationDebug", "Geocoder error: $errorMessage")
+//                onAddressFound("Gagal mendapatkan alamat")
+//            }
+//        })
+//    } else {
+//        try {
+//            val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+//            if (!addresses.isNullOrEmpty()) {
+//                val address = addresses[0]
+//                val result = "${address.adminArea}, ${address.subAdminArea}, ${address.locality}, ${address.subLocality}"
+//                Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: $result")
+//                onAddressFound(result)
+//            } else {
+//                Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: Not Found")
+//                onAddressFound("Alamat tidak ditemukan")
+//            }
+//        } catch (e: IOException) {
+//            Log.e("LocationDebug", "Gagal mendapatkan alamat: ${e.message}")
+//            onAddressFound("Gagal mendapatkan alamat")
+//        }
+//    }
+//}
+
+//fun getCurrentLocation(context: Context, onLocationRetrieved: (Double?, Double?, String?) -> Unit) {
+
+
+// Ini Baruu
+//fun getAddressFromLocation(
+//    latitude: Double,
+//    longitude: Double,
+//    context: Context,
+//    onAddressFound: (Address?) -> Unit // Mengembalikan Address, bukan String
+//) {
+//    val geocoder = Geocoder(context, Locale.getDefault())
+//
+//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//        geocoder.getFromLocation(latitude, longitude, 1, object : Geocoder.GeocodeListener {
+//            override fun onGeocode(addresses: MutableList<Address>) {
+//                if (addresses.isNotEmpty()) {
+//                    val address = addresses[0] // Kirim Address langsung
+//                    Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: $address")
+//                    onAddressFound(address) // Kirim Address, bukan String
+//                } else {
+//                    Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: Not Found")
+//                    onAddressFound(null) // Tidak ditemukan
+//                }
+//            }
+//
+//            override fun onError(errorMessage: String?) {
+//                Log.e("LocationDebug", "Geocoder error: $errorMessage")
+//                onAddressFound(null)
+//            }
+//        })
+//    } else {
+//        try {
+//            val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+//            if (!addresses.isNullOrEmpty()) {
+//                val address = addresses[0]
+//                Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: $address")
+//                onAddressFound(address)
+//            } else {
+//                Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: Not Found")
+//                onAddressFound(null)
+//            }
+//        } catch (e: IOException) {
+//            Log.e("LocationDebug", "Gagal mendapatkan alamat: ${e.message}")
+//            onAddressFound(null)
+//        }
+//    }
+//}
+
 fun getAddressFromLocation(
     latitude: Double,
     longitude: Double,
     context: Context,
-    onAddressFound: (String) -> Unit
+    onAddressFound: (String?, String?, String?, String?) -> Unit // Mengembalikan 4 nilai
 ) {
     val geocoder = Geocoder(context, Locale.getDefault())
 
@@ -32,18 +126,29 @@ fun getAddressFromLocation(
             override fun onGeocode(addresses: MutableList<Address>) {
                 if (addresses.isNotEmpty()) {
                     val address = addresses[0]
-                    val result = "${address.adminArea}, ${address.subAdminArea}, ${address.locality}, ${address.subLocality}"
-                    Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: $result")
-                    onAddressFound(result)
+                    val adminArea = address.adminArea // Provinsi
+                    val subAdminArea = address.subAdminArea // Kabupaten/Kota
+                    val locality = address.locality // Kota atau Kecamatan
+                    val subLocality = address.subLocality // Kelurahan atau Desa
+
+                    Log.d("LocationDebug", """
+                        Lat: $latitude, Lon: $longitude
+                        Admin Area: $adminArea
+                        Sub Admin Area: $subAdminArea
+                        Locality: $locality
+                        Sub Locality: $subLocality
+                    """.trimIndent())
+
+                    onAddressFound(adminArea, subAdminArea, locality, subLocality)
                 } else {
                     Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: Not Found")
-                    onAddressFound("Alamat tidak ditemukan")
+                    onAddressFound(null, null, null, null)
                 }
             }
 
             override fun onError(errorMessage: String?) {
                 Log.e("LocationDebug", "Geocoder error: $errorMessage")
-                onAddressFound("Gagal mendapatkan alamat")
+                onAddressFound(null, null, null, null)
             }
         })
     } else {
@@ -51,26 +156,38 @@ fun getAddressFromLocation(
             val addresses = geocoder.getFromLocation(latitude, longitude, 1)
             if (!addresses.isNullOrEmpty()) {
                 val address = addresses[0]
-                val result = "${address.adminArea}, ${address.subAdminArea}, ${address.locality}, ${address.subLocality}"
-                Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: $result")
-                onAddressFound(result)
+                val adminArea = address.adminArea
+                val subAdminArea = address.subAdminArea
+                val locality = address.locality
+                val subLocality = address.subLocality
+
+                Log.d("LocationDebug", """
+                    Lat: $latitude, Lon: $longitude
+                    Admin Area: $adminArea
+                    Sub Admin Area: $subAdminArea
+                    Locality: $locality
+                    Sub Locality: $subLocality
+                """.trimIndent())
+
+                onAddressFound(adminArea, subAdminArea, locality, subLocality)
             } else {
                 Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: Not Found")
-                onAddressFound("Alamat tidak ditemukan")
+                onAddressFound(null, null, null, null)
             }
         } catch (e: IOException) {
             Log.e("LocationDebug", "Gagal mendapatkan alamat: ${e.message}")
-            onAddressFound("Gagal mendapatkan alamat")
+            onAddressFound(null, null, null, null)
         }
     }
 }
 
-fun getCurrentLocation(context: Context, onLocationRetrieved: (Double?, Double?, String?) -> Unit) {
+
+fun getCurrentLocation(context: Context, onLocationRetrieved: (Double?, Double?, String?, String?, String?, String?) -> Unit) {
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
     if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
         Log.e("LocationDebug", "Izin lokasi tidak diberikan")
-        onLocationRetrieved(null, null, null)
+        onLocationRetrieved(null, null, null, null, null, null)
         return
     }
 
@@ -81,19 +198,133 @@ fun getCurrentLocation(context: Context, onLocationRetrieved: (Double?, Double?,
     val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             locationResult.lastLocation?.let {
-                Log.d("LocationDebug", "Lokasi ditemukan: Lat ${it.latitude}, Lon ${it.longitude}")
-                getAddressFromLocation(it.latitude, it.longitude, context) { address ->
-                    onLocationRetrieved(it.latitude, it.longitude, address)
+                getAddressFromLocation(it.latitude, it.longitude, context) { adminArea, subAdminArea, locality, subLocality ->
+                    onLocationRetrieved(it.latitude, it.longitude, adminArea, subAdminArea, locality, subLocality)
                 }
-
                 fusedLocationClient.removeLocationUpdates(this)
-
             } ?: run {
                 Log.e("LocationDebug", "Gagal mendapatkan lokasi dari request update")
-                onLocationRetrieved(null, null, null)
+                onLocationRetrieved(null, null, null, null, null, null)
             }
         }
     }
 
     fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
 }
+
+
+//    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+//
+//    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//        Log.e("LocationDebug", "Izin lokasi tidak diberikan")
+//        onLocationRetrieved(null, null, null)
+//        return
+//    }
+//
+//    val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000)
+//        .setWaitForAccurateLocation(true)
+//        .build()
+//
+//    val locationCallback = object : LocationCallback() {
+//        override fun onLocationResult(locationResult: LocationResult) {
+//            locationResult.lastLocation?.let {
+//                Log.d("LocationDebug", "Lokasi ditemukan: Lat ${it.latitude}, Lon ${it.longitude}")
+//                getAddressFromLocation(it.latitude, it.longitude, context) { address ->
+//                    onLocationRetrieved(it.latitude, it.longitude, address)
+//                }
+//
+//                fusedLocationClient.removeLocationUpdates(this)
+//
+//            } ?: run {
+//                Log.e("LocationDebug", "Gagal mendapatkan lokasi dari request update")
+//                onLocationRetrieved(null, null, null)
+//            }
+//        }
+//    }
+//
+//    fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+//}
+
+
+//Ini baruu
+//fun getCurrentLocation(
+//    context: Context,
+//    onLocationRetrieved: (
+//        Double?, Double?, String?, String?, String?, String?
+//    ) -> Unit
+//) {
+//    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+//
+//    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+//        != PackageManager.PERMISSION_GRANTED
+//    ) {
+//        Log.e("LocationDebug", "Izin lokasi tidak diberikan")
+//        onLocationRetrieved(null, null, null, null, null, null)
+//        return
+//    }
+//
+//    val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000)
+//        .setWaitForAccurateLocation(true)
+//        .build()
+//
+//    val locationCallback = object : LocationCallback() {
+//        override fun onLocationResult(locationResult: LocationResult) {
+//            locationResult.lastLocation?.let { location ->
+//                Log.d("LocationDebug", "Lokasi ditemukan: Lat ${location.latitude}, Lon ${location.longitude}")
+//
+//                // Panggil geocoder untuk mendapatkan alamat berdasarkan lokasi
+//                getAddressFromLocation(location.latitude, location.longitude, context) { address ->
+//                    onLocationRetrieved(
+//                        location.latitude,
+//                        location.longitude,
+//                        address?.adminArea ?: "Alamat tidak ditemukan",
+//                        address?.subAdminArea ?: "Alamat tidak ditemukan",
+//                        address?.locality ?: "Alamat tidak ditemukan",
+//                        address?.subLocality ?: "Alamat tidak ditemukan"
+//                    )
+//                }
+//
+//                // Hentikan update lokasi setelah mendapatkan data
+//                fusedLocationClient.removeLocationUpdates(this)
+//            } ?: run {
+//                Log.e("LocationDebug", "Gagal mendapatkan lokasi dari request update")
+//                onLocationRetrieved(null, null, null, null, null, null)
+//            }
+//        }
+//    }
+//
+//    fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+//}
+
+
+//fun getCurrentLocation(context: Context, onLocationRetrieved: (Double?, Double?, String?, String?, String?, String?) -> Unit) {
+//    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+//
+//    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//        Log.e("LocationDebug", "Izin lokasi tidak diberikan")
+//        onLocationRetrieved(null, null, null, null, null, null)
+//        return
+//    }
+//
+//    val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000)
+//        .setWaitForAccurateLocation(true)
+//        .build()
+//
+//    val locationCallback = object : LocationCallback() {
+//        override fun onLocationResult(locationResult: LocationResult) {
+//            locationResult.lastLocation?.let {
+//                getAddressFromLocation(it.latitude, it.longitude, context) { adminArea, subAdminArea, locality, subLocality ->
+//                    onLocationRetrieved(it.latitude, it.longitude, adminArea, subAdminArea, locality, subLocality)
+//                }
+//                fusedLocationClient.removeLocationUpdates(this)
+//            } ?: run {
+//                Log.e("LocationDebug", "Gagal mendapatkan lokasi dari request update")
+//                onLocationRetrieved(null, null, null, null, null, null)
+//            }
+//        }
+//    }
+//
+//    fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+//}
+//
+//

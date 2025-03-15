@@ -52,8 +52,11 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.practice.fixkan.component.TopBar
 import com.practice.fixkan.navigation.Screen
+import com.practice.fixkan.screen.CreateReport.ReportViewModel
 import com.practice.fixkan.ui.theme.FixKanTheme
 import com.practice.fixkan.utils.getCurrentLocation
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Composable
 fun ResultClassificationScreen(imageUri: String?, result: String, navController: NavController) {
@@ -65,7 +68,9 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
     var latitude by rememberSaveable { mutableStateOf<Double?>(null) }
     var longitude by rememberSaveable { mutableStateOf<Double?>(null) }
     var address by rememberSaveable { mutableStateOf<String?>(null) }
-    
+
+    val reportViewModel = remember { ReportViewModel() }
+
     var locationPermissionGranted by rememberSaveable { mutableStateOf(false) }
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -74,10 +79,10 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
         locationPermissionGranted = isGranted // Simpan status izin
 
         if (isGranted) {
-            fetchLocation(context, onSuccess = { lat, lon, addr ->
+            fetchLocation(context, onSuccess = { lat, lon, adminArea, subAdminArea, locality, subLocality ->
                 latitude = lat
                 longitude = lon
-                address = addr
+                address = "$adminArea, $subAdminArea, $locality, $subLocality"
                 succesDialog = true
                 errorDialog = false
             }, onError = {
@@ -126,6 +131,15 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
             }
             Text(
                 modifier = Modifier.fillMaxWidth(),
+                text = "Tipe Laporan:",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                lineHeight = 40.sp
+            )
+            Spacer(Modifier.height(10.dp))
+            Text(
+                modifier = Modifier.fillMaxWidth(),
                 text = result,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
@@ -136,33 +150,67 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
             Button(
                 onClick = {
                     Log.d("LocationDebug", "Button clicked, trying to get location...")
-
+                    Toast.makeText(context, "Mengambil Lokasi...", Toast.LENGTH_SHORT).show()
                     if (ActivityCompat.checkSelfPermission(
                             context, Manifest.permission.ACCESS_FINE_LOCATION
-                        ) != PackageManager.PERMISSION_GRANTED
+                        ) == PackageManager.PERMISSION_GRANTED
                     ) {
-                        ActivityCompat.requestPermissions(
-                            context as Activity,
-                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                            100
-                        )
-                        // Jika izin sudah diberikan, coba ambil lokasi
-                        getCurrentLocation(context) { lat, lon, addr ->
-                            if (lat != null && lon != null && !addr.isNullOrEmpty()) {
+                        // Izin sudah diberikan, langsung ambil lokasi
+                        getCurrentLocation(context) { lat, lon, adminArea, subAdminArea, locality, subLocality ->
+                            if (lat != null && lon != null &&
+                                !adminArea.isNullOrEmpty() &&
+                                !subAdminArea.isNullOrEmpty() &&
+                                !locality.isNullOrEmpty() &&
+                                !subLocality.isNullOrEmpty()
+                            ) {
                                 latitude = lat
                                 longitude = lon
-                                address = addr
+                                address = "$adminArea, $subAdminArea, $locality, $subLocality"
                                 succesDialog = true
                                 errorDialog = false
+
+                                // Set data ke ViewModel
+                                reportViewModel.setReportData(
+                                    typeReport = result,
+                                    photoUri = Uri.parse(imageUri),
+                                    lat = lat,
+                                    long = lon,
+                                    admArea = adminArea,
+                                    subAdmArea = subAdminArea,
+                                    local = locality,
+                                    subLocal = subLocality
+                                )
+                                // Logging untuk memastikan data berhasil dikirim ke ViewModel
+                                Log.d("LocationDebug", "Data set to ViewModel: photo: $imageUri typeReport=$result lat=$lat, lon=$lon, " +
+                                        "adminArea=$adminArea, subAdminArea=$subAdminArea, " +
+                                        "locality=$locality, subLocality=$subLocality")
                             } else {
+                                // Jika data lokasi belum lengkap, coba lagi setelah delay 2 detik
                                 Handler(Looper.getMainLooper()).postDelayed({
-                                    getCurrentLocation(context) { newLat, newLon, newAddr ->
-                                        if (newLat != 0.0 && newLon != 0.0 && !newAddr.isNullOrEmpty()) {
+                                    getCurrentLocation(context) { newLat, newLon, newAdmin, newSubAdmin, newLocal, newSubLocal ->
+                                        if (newLat != null && newLon != null &&
+                                            !newAdmin.isNullOrEmpty() &&
+                                            !newSubAdmin.isNullOrEmpty() &&
+                                            !newLocal.isNullOrEmpty() &&
+                                            !newSubLocal.isNullOrEmpty()
+                                        ) {
                                             latitude = newLat
                                             longitude = newLon
-                                            address = newAddr
+                                            address = "$newAdmin, $newSubAdmin, $newLocal, $newSubLocal"
                                             succesDialog = true
                                             errorDialog = false
+
+                                            // Set data ke ViewModel
+                                            reportViewModel.setReportData(
+                                                typeReport = result,
+                                                photoUri = Uri.parse(imageUri),
+                                                lat = newLat,
+                                                long = newLon,
+                                                admArea = newAdmin,
+                                                subAdmArea = newSubAdmin,
+                                                local = newLocal,
+                                                subLocal = newSubLocal
+                                            )
                                         } else {
                                             errorDialog = true
                                         }
@@ -171,7 +219,7 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
                             }
                         }
                     } else {
-                        // Jika izin belum diberikan, minta izin terlebih dahulu
+                        // Jika izin belum diberikan, gunakan ActivityResultLauncher untuk meminta izin
                         locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                     }
                 },
@@ -207,8 +255,7 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
                         Column {
                             Text(text = "Latitude: $latitude")
                             Text(text = "Longitude: $longitude")
-                            Text(text = "Alamat: $address\n\n")
-                            Text(text = "Laporan sudah siap")
+                            Text(text = "Alamat: $address")
                         }
                     },
                     confirmButton = {
@@ -248,11 +295,16 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
             }
             Spacer(Modifier.height(60.dp))
             Button(
-                onClick = {},
-                shape = RoundedCornerShape(10.dp),
+                onClick = {
+                    val reportData = reportViewModel.reportData.value
+                    val jsonData = Uri.encode(Json.encodeToString(reportData))
+                    navController.navigate("create_report/$jsonData")
+                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 40.dp),
+                    .padding(horizontal = 30.dp)
+                    .height(45.dp),
+                shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(android.graphics.Color.parseColor("#276561"))
                 ),
@@ -263,7 +315,7 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
             ) {
                 Text(
                     text = "Laporkan",
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold
                 )
             }
@@ -275,7 +327,8 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 40.dp),
+                    .padding(horizontal = 30.dp)
+                    .height(45.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(android.graphics.Color.parseColor("#FFFFFF"))
                 ),
@@ -286,7 +339,7 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
             ) {
                 Text(
                     text = "Kembali ke Beranda",
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(android.graphics.Color.parseColor("#276561"))
                 )
@@ -295,17 +348,52 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
     }
 }
 
-fun fetchLocation(context: Context, onSuccess: (Double, Double, String) -> Unit, onError: () -> Unit) {
+//fun fetchLocation(context: Context, onSuccess: (Double, Double, String) -> Unit, onError: () -> Unit) {
+//    Toast.makeText(context, "Mengambil lokasi...", Toast.LENGTH_SHORT).show()
+//
+//    getCurrentLocation(context) { lat, lon, addr ->
+//        if (lat != 0.0 && lon != 0.0 && !addr.isNullOrEmpty()) {
+//            onSuccess(lat!!, lon!!, addr)
+//        } else {
+//            Handler(Looper.getMainLooper()).postDelayed({
+//                getCurrentLocation(context) { newLat, newLon, newAddr ->
+//                    if (newLat != 0.0 && newLon != 0.0 && !newAddr.isNullOrEmpty()) {
+//                        onSuccess(newLat!!, newLon!!, newAddr)
+//                    } else {
+//                        onError()
+//                    }
+//                }
+//            }, 2000)
+//        }
+//    }
+//}
+
+fun fetchLocation(
+    context: Context,
+    onSuccess: (Double, Double, String, String, String, String) -> Unit,
+    onError: () -> Unit
+) {
     Toast.makeText(context, "Mengambil lokasi...", Toast.LENGTH_SHORT).show()
 
-    getCurrentLocation(context) { lat, lon, addr ->
-        if (lat != 0.0 && lon != 0.0 && !addr.isNullOrEmpty()) {
-            onSuccess(lat!!, lon!!, addr)
+    getCurrentLocation(context) { lat, lon, adminArea, subAdminArea, locality, subLocality ->
+        if (lat != null && lon != null &&
+            !adminArea.isNullOrEmpty() &&
+            !subAdminArea.isNullOrEmpty() &&
+            !locality.isNullOrEmpty() &&
+            !subLocality.isNullOrEmpty()
+        ) {
+            onSuccess(lat, lon, adminArea, subAdminArea, locality, subLocality)
         } else {
+            // Jika lokasi pertama gagal, coba kembali setelah 2 detik
             Handler(Looper.getMainLooper()).postDelayed({
-                getCurrentLocation(context) { newLat, newLon, newAddr ->
-                    if (newLat != 0.0 && newLon != 0.0 && !newAddr.isNullOrEmpty()) {
-                        onSuccess(newLat!!, newLon!!, newAddr)
+                getCurrentLocation(context) { newLat, newLon, newAdmin, newSubAdmin, newLocal, newSubLocal ->
+                    if (newLat != null && newLon != null &&
+                        !newAdmin.isNullOrEmpty() &&
+                        !newSubAdmin.isNullOrEmpty() &&
+                        !newLocal.isNullOrEmpty() &&
+                        !newSubLocal.isNullOrEmpty()
+                    ) {
+                        onSuccess(newLat, newLon, newAdmin, newSubAdmin, newLocal, newSubLocal)
                     } else {
                         onError()
                     }
@@ -314,6 +402,7 @@ fun fetchLocation(context: Context, onSuccess: (Double, Double, String) -> Unit,
         }
     }
 }
+
 
 @Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_3A_XL)
 @Composable
