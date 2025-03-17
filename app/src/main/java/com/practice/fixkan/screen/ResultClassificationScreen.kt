@@ -1,6 +1,6 @@
 package com.practice.fixkan.screen
+
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
@@ -39,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -51,6 +52,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.practice.fixkan.component.TopBar
+import com.practice.fixkan.model.ReportData
 import com.practice.fixkan.navigation.Screen
 import com.practice.fixkan.screen.CreateReport.ReportViewModel
 import com.practice.fixkan.ui.theme.FixKanTheme
@@ -61,10 +63,10 @@ import kotlinx.serialization.json.Json
 @Composable
 fun ResultClassificationScreen(imageUri: String?, result: String, navController: NavController) {
 
+    val context = LocalContext.current
     var succesDialog by rememberSaveable { mutableStateOf(false) }
     var errorDialog by rememberSaveable { mutableStateOf(false) }
 
-    val context = LocalContext.current
     var latitude by rememberSaveable { mutableStateOf<Double?>(null) }
     var longitude by rememberSaveable { mutableStateOf<Double?>(null) }
     var address by rememberSaveable { mutableStateOf<String?>(null) }
@@ -72,24 +74,26 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
     val reportViewModel = remember { ReportViewModel() }
 
     var locationPermissionGranted by rememberSaveable { mutableStateOf(false) }
-
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         locationPermissionGranted = isGranted // Simpan status izin
 
         if (isGranted) {
-            fetchLocation(context, onSuccess = { lat, lon, adminArea, subAdminArea, locality, subLocality ->
-                latitude = lat
-                longitude = lon
-                address = "$adminArea, $subAdminArea, $locality, $subLocality"
-                succesDialog = true
-                errorDialog = false
-            }, onError = {
-                errorDialog = true
-            })
+            fetchLocation(
+                context,
+                onSuccess = { lat, lon, adminArea, subAdminArea, locality, subLocality ->
+                    latitude = lat
+                    longitude = lon
+                    address = "$adminArea, $subAdminArea, $locality, $subLocality"
+                    succesDialog = true
+                    errorDialog = false
+                },
+                onError = {
+                    errorDialog = true
+                })
         } else {
-            Toast.makeText(context, "Izin lokasi ditolak", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Akses lokasi belum dizinkan", Toast.LENGTH_LONG).show()
             errorDialog = true
         }
     }
@@ -109,6 +113,9 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
         }
     }
 
+    Log.d("Bitmap_ResultClassificationScreen", "Bitmap: $bitmap")
+    Log.d("Uri_ResultClassificationScreen", "Bitmap: $imageUri")
+
     Scaffold(
         topBar = {
             TopBar(title = "Hasil Klasifikasi", navController = navController)
@@ -118,15 +125,18 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
             Modifier
                 .fillMaxSize()
                 .padding(it)
+                .padding(12.dp)
                 .background(color = Color(android.graphics.Color.parseColor("#E7FFF2")))
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            bitmap?.let {
+            bitmap?.let { imgBitmap ->
                 AsyncImage(
-                    model = it,
+                    model = imgBitmap,
                     contentDescription = "Classified Image",
-                    modifier = Modifier.size(400.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center
                 )
             }
             Text(
@@ -137,12 +147,11 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
                 textAlign = TextAlign.Center,
                 lineHeight = 40.sp
             )
-            Spacer(Modifier.height(10.dp))
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = result,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
                 lineHeight = 40.sp
             )
@@ -172,7 +181,7 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
                                 // Set data ke ViewModel
                                 reportViewModel.setReportData(
                                     typeReport = result,
-                                    photoUri = Uri.parse(imageUri),
+                                    photoUri = Uri.encode(imageUri.toString()),
                                     lat = lat,
                                     long = lon,
                                     admArea = adminArea,
@@ -182,8 +191,9 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
                                 )
                                 // Logging untuk memastikan data berhasil dikirim ke ViewModel
                                 Log.d("LocationDebug", "Data set to ViewModel: photo: $imageUri typeReport=$result lat=$lat, lon=$lon, " +
-                                        "adminArea=$adminArea, subAdminArea=$subAdminArea, " +
-                                        "locality=$locality, subLocality=$subLocality")
+                                            "adminArea=$adminArea, subAdminArea=$subAdminArea, " +
+                                            "locality=$locality, subLocality=$subLocality"
+                                )
                             } else {
                                 // Jika data lokasi belum lengkap, coba lagi setelah delay 2 detik
                                 Handler(Looper.getMainLooper()).postDelayed({
@@ -203,7 +213,7 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
                                             // Set data ke ViewModel
                                             reportViewModel.setReportData(
                                                 typeReport = result,
-                                                photoUri = Uri.parse(imageUri),
+                                                photoUri = Uri.encode(imageUri.toString()),
                                                 lat = newLat,
                                                 long = newLon,
                                                 admArea = newAdmin,
@@ -294,15 +304,25 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
                 )
             }
             Spacer(Modifier.height(60.dp))
+            Spacer(Modifier.weight(1f))
             Button(
                 onClick = {
-                    val reportData = reportViewModel.reportData.value
+                    reportViewModel.setReportData(
+                        typeReport = result,
+                        photoUri = Uri.encode(imageUri.toString())
+                    )
+                    val reportData = reportViewModel.reportData.value ?: ReportData(
+                        typeReport = result,
+                        photoUri = Uri.encode(imageUri.toString())
+                    )
                     val jsonData = Uri.encode(Json.encodeToString(reportData))
+                    Log.d("Uri_ResultClassificationScreen", "Original URI: $imageUri")
+                    Log.d("Uri_ResultClassificationScreen", "Parsed URI: ${Uri.parse(imageUri)}")
+                    Log.d("Uri_ResultClassificationScreen", "Encoded JSON: $jsonData")
                     navController.navigate("create_report/$jsonData")
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 30.dp)
                     .height(45.dp),
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -319,15 +339,14 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
                     fontWeight = FontWeight.SemiBold
                 )
             }
-            Spacer(Modifier.height(20.dp))
             Button(
                 onClick = {
-                    navController.navigate(Screen.Home.route)
+                    navController.navigate(Screen.Classification.route)
                 },
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 30.dp)
+                    .padding(vertical = 14.dp)
                     .height(45.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(android.graphics.Color.parseColor("#FFFFFF"))
@@ -338,7 +357,7 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
                 )
             ) {
                 Text(
-                    text = "Kembali ke Beranda",
+                    text = "Unggah Ulang Foto",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(android.graphics.Color.parseColor("#276561"))
@@ -348,26 +367,6 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
     }
 }
 
-//fun fetchLocation(context: Context, onSuccess: (Double, Double, String) -> Unit, onError: () -> Unit) {
-//    Toast.makeText(context, "Mengambil lokasi...", Toast.LENGTH_SHORT).show()
-//
-//    getCurrentLocation(context) { lat, lon, addr ->
-//        if (lat != 0.0 && lon != 0.0 && !addr.isNullOrEmpty()) {
-//            onSuccess(lat!!, lon!!, addr)
-//        } else {
-//            Handler(Looper.getMainLooper()).postDelayed({
-//                getCurrentLocation(context) { newLat, newLon, newAddr ->
-//                    if (newLat != 0.0 && newLon != 0.0 && !newAddr.isNullOrEmpty()) {
-//                        onSuccess(newLat!!, newLon!!, newAddr)
-//                    } else {
-//                        onError()
-//                    }
-//                }
-//            }, 2000)
-//        }
-//    }
-//}
-
 fun fetchLocation(
     context: Context,
     onSuccess: (Double, Double, String, String, String, String) -> Unit,
@@ -376,7 +375,8 @@ fun fetchLocation(
     Toast.makeText(context, "Mengambil lokasi...", Toast.LENGTH_SHORT).show()
 
     getCurrentLocation(context) { lat, lon, adminArea, subAdminArea, locality, subLocality ->
-        if (lat != null && lon != null &&
+        if (lat != null &&
+            lon != null &&
             !adminArea.isNullOrEmpty() &&
             !subAdminArea.isNullOrEmpty() &&
             !locality.isNullOrEmpty() &&

@@ -7,10 +7,10 @@ import kotlinx.serialization.Serializable
 data class ReportData(
     val typeReport: String,
     val photoUri: String,
-    val lat: Double,
-    val long: Double,
-    val admArea: String,
-    val subAdmArea: String,
-    val local: String,
-    val subLocal: String
+    val lat: Double? = 0.0,
+    val long: Double? = 0.0,
+    val admArea: String? = null,
+    val subAdmArea: String? = null,
+    val local: String? = null,
+    val subLocal: String? = null
 )

@@ -2,9 +2,6 @@ package com.practice.fixkan.screen.CreateReport
 
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,13 +35,13 @@ class ReportViewModel : ViewModel() {
 
     fun setReportData(
         typeReport: String,
-        photoUri: Uri?,
-        lat: Double,
-        long: Double,
-        admArea: String,
-        subAdmArea: String,
-        local: String,
-        subLocal: String
+        photoUri: String,
+        lat: Double? = 0.0,
+        long: Double? = 0.0,
+        admArea: String? = null,
+        subAdmArea: String? = null,
+        local: String? = null,
+        subLocal: String? = null
     ) {
         Log.d(
             "ReportViewModel",

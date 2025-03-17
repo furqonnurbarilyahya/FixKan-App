@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 //@Composable
@@ -189,6 +190,7 @@ import androidx.navigation.NavController
 @Composable
 fun EditableDropdownSelector(
     label: String,
+    previousForm: String,
     options: List<String>,
     selectedOption: String,
     onOptionSelected: (String) -> Unit,
@@ -221,13 +223,88 @@ fun EditableDropdownSelector(
                     modifier = Modifier.clickable { expanded = !expanded }
                 )
             },
+            placeholder = { Text(
+                text = "Pilih $previousForm dengan benar agar opsi muncul.",
+                fontSize = 14.sp,
+                color = Color.Red
+            ) },
             modifier = Modifier.fillMaxWidth()
         )
 
         // **Tunggu sampai user berhenti mengetik selama 2s baru buka dropdown**
         LaunchedEffect(textValue) {
-            kotlinx.coroutines.delay(2000) // Jeda 2s
-            if (System.currentTimeMillis() - lastInputTime >= 2000) {
+            kotlinx.coroutines.delay(500) // Jeda 2s
+            if (System.currentTimeMillis() - lastInputTime >= 500) {
+                expanded = textValue.isNotEmpty() && filteredOptions.isNotEmpty()
+            }
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            filteredOptions.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option) },
+                    onClick = {
+                        textValue = option
+                        onOptionSelected(option)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+    Spacer(Modifier.height(12.dp))
+}
+
+@Composable
+fun EditableDropdownSelectorProvince(
+    label: String,
+    options: List<String>,
+    selectedOption: String,
+    onOptionSelected: (String) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var textValue by remember { mutableStateOf(selectedOption) }
+    var filteredOptions by remember { mutableStateOf(options) }
+    var lastInputTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
+
+    Column {
+        OutlinedTextField(
+            value = textValue,
+            onValueChange = { input ->
+                textValue = input
+                lastInputTime = System.currentTimeMillis()
+
+                // **Jangan langsung update dropdown saat user mengetik**
+                if (input.isNotEmpty()) {
+                    filteredOptions = options.filter { it.contains(input, ignoreCase = true) }
+                } else {
+                    filteredOptions = options
+                    expanded = false // **Tutup dropdown jika input kosong**
+                }
+            },
+            label = { Text(label) },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = "Dropdown Icon",
+                    modifier = Modifier.clickable { expanded = !expanded }
+                )
+            },
+            placeholder = { Text(
+                text = "Isi $label dengan benar agar opsi muncul.",
+                fontSize = 14.sp,
+                color = Color.Red
+            ) },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // **Tunggu sampai user berhenti mengetik selama 2s baru buka dropdown**
+        LaunchedEffect(textValue) {
+            kotlinx.coroutines.delay(500) // Jeda 2s
+            if (System.currentTimeMillis() - lastInputTime >= 500) {
                 expanded = textValue.isNotEmpty() && filteredOptions.isNotEmpty()
             }
         }

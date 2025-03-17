@@ -1,9 +1,10 @@
 package com.practice.fixkan.screen
 
+import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.compose.material3.Icon
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
@@ -29,9 +30,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,7 +54,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.practice.fixkan.R
 import com.practice.fixkan.component.LoadingDialog
@@ -64,7 +64,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun ClassificationScreen(navController: NavController) {
-    
+
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
@@ -75,50 +75,36 @@ fun ClassificationScreen(navController: NavController) {
     var showDialog by remember { mutableStateOf(false) }
     var showResult by remember { mutableStateOf(false) }
 
-    // Camera Launcher
+    // camera Launcher
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview(),
         onResult = { bitmap ->
             bitmap?.let {
-                val uri = Uri.parse(
-                    MediaStore.Images.Media.insertImage(
-                        context.contentResolver,
-                        it,
-                        null,
-                        null
-                    )
-                )
-                imageUri = uri
+                try {
+                    // Simpan gambar ke MediaStore
+                    val savedUri = saveImageToMediaStore(context, it)
+                    imageUri = savedUri
+
+                    // Konversi URI ke Bitmap (Mirip Gallery Launcher)
+                    val inputStream = context.contentResolver.openInputStream(savedUri!!)
+                    imageBitmap = BitmapFactory.decodeStream(inputStream)
+                    inputStream?.close()
+
+                    Log.d("Bitmap_CameraScreen", "Bitmap: $imageBitmap")
+                    Log.d("Uri_CameraScreen", "Uri: $imageUri")
+                } catch (e: Exception) {
+                    Log.e("CameraScreen", "Error processing image: ${e.message}")
+                }
             }
         }
     )
+
 
     // Gallery Launcher
     val galleryLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             uri?.let {
-//                imageUri = it
-////            imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, it)
-////            val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
-////                ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, it))
-////                } else {
-////                MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
-////            }
-//                val inputStream = context.contentResolver.openInputStream(it)
-//                val bitmap = BitmapFactory.decodeStream(inputStream)
-//                inputStream?.close()
-//                imageBitmap = bitmap
-
-
-//                context.contentResolver.takePersistableUriPermission(
-//                    it,
-//                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-//                )
-//                val bmp = MediaStore.Images.Media.getBitmap(context.contentResolver, it)
-//                imageUri = it
-//                imageBitmap = bmp
                 try {
-                    // Ambil izin baca untuk akses persisten
                     context.contentResolver.takePersistableUriPermission(
                         it,
                         Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -128,205 +114,223 @@ fun ClassificationScreen(navController: NavController) {
                     val inputStream = context.contentResolver.openInputStream(it)
                     imageBitmap = BitmapFactory.decodeStream(inputStream)
                     inputStream?.close()
+                    Log.d("Bitmap_ClassificationScreen", "Bitmap: $imageBitmap")
+                    Log.d("Uri_ClassificationScreen", "Uri: $imageUri")
                 } catch (e: Exception) {
                     Log.e("ClassificationScreen", "Error loading image: ${e.message}")
                 }
             }
         }
 
-    if (showResult) {
-//        ResultClassificationScreen()
-    } else {
-        Scaffold(
-            topBar = {
-                TopBar(title = "Buat Laporan", navController = navController)
-            }
+    Scaffold(
+        topBar = {
+            TopBar(title = "Buat Laporan", navController = navController)
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+                .padding(12.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
+            Spacer(Modifier.height(20.dp))
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "Gunakan AI untuk Deteksi & Laporkan Masalah dengan Mudah!",
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(Modifier.height(20.dp))
+            Text(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(it)
-                    .padding(12.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp),
+                text = "Unggah foto infrastruktur atau lingkungan yang rusak. AI kami akan mengklasifikasikan jenis kerusakan secara otomatis!",
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+            )
+            Box(
+                modifier = Modifier
+                    .size(300.dp)
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(8.dp)
+                    ),
+                contentAlignment = Alignment.Center
             ) {
-                Spacer(Modifier.height(20.dp))
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = "Gunakan AI untuk Deteksi & Laporkan Masalah dengan Mudah!",
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(Modifier.height(20.dp))
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp),
-                    text = "Unggah foto infrastruktur atau lingkungan yang rusak. AI kami akan mengklasifikasikan jenis kerusakan secara otomatis!",
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                )
-                Box(
-                    modifier = Modifier
-                        .size(300.dp)
-                        .background(
-                            color = Color.White,
-                            shape = RoundedCornerShape(8.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (imageUri != null) {
-                        Image(
-                            painter = rememberAsyncImagePainter(imageUri),
-                            contentDescription = "Selected Image",
-                            modifier = Modifier.fillMaxSize()
-                        )
-                        IconButton(
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(top = 8.dp, end = 4.dp)
-                                .clip(CircleShape)
-                                .background(Color.Black)
-                                .zIndex(2f),
-                            onClick = {
-                                imageUri = null
-                            }
-                        ) {
-                            Icon(
-                                Icons.Default.Clear,
-                                contentDescription = "Clear Image",
-                                tint = Color.White
-                            )
+                if (imageUri != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(imageUri),
+                        contentDescription = "Selected Image",
+                        modifier = Modifier.fillMaxSize()
+                    )
+                    IconButton(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 8.dp, end = 4.dp)
+                            .clip(CircleShape)
+                            .background(Color.Black)
+                            .zIndex(2f),
+                        onClick = {
+                            imageUri = null
                         }
-                    } else {
-                        Image(
-                            painter = painterResource(id = R.drawable.idcamp),
-                            contentDescription = "Default Image",
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                }
-                Spacer(Modifier.height(12.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Button(
-                        onClick = {
-                            cameraLauncher.launch(null)
-                        },
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.size(height = 45.dp, width = 140.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(android.graphics.Color.parseColor("#276561"))
-                        )
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.baseline_camera_alt_24),
-                            contentDescription = "Camera",
-                            modifier = Modifier.padding(end = 10.dp)
-                        )
-                        Text(
-                            text = "Kamera",
-                            fontSize = 16.sp
+                            Icons.Default.Clear,
+                            contentDescription = "Clear Image",
+                            tint = Color.White
                         )
                     }
-                    Button(
-                        onClick = {
-                            galleryLauncher.launch(arrayOf("image/*"))
-                        },
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.size(height = 45.dp, width = 140.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(android.graphics.Color.parseColor("#276561"))
-                        )
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_insert_photo_24),
-                            contentDescription = "Camera",
-                            modifier = Modifier.padding(end = 10.dp)
-                        )
-                        Text(
-                            text = "Galeri",
-                            fontSize = 16.sp
-                        )
-                    }
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.idcamp),
+                        contentDescription = "Default Image",
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
-                Spacer(Modifier.height(20.dp))
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp),
-                    text = "Tips:",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Start
-                )
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp),
-                    text = "\"Pastikan foto dan pencahayaan jelas agar AI bisa bekerja optimal\"",
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Start
-                )
-
-                Spacer(Modifier.weight(1f))
-
+            }
+            Spacer(Modifier.height(12.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
                 Button(
                     onClick = {
-                        showDialog = true
+                        cameraLauncher.launch(null)
                     },
-                    enabled = imageUri != null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp)
-                        .height(45.dp),
                     shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.size(height = 45.dp, width = 140.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(android.graphics.Color.parseColor("#276561"))
-                    ),
-                    elevation = ButtonDefaults.buttonElevation(
-                        defaultElevation = 6.dp,
-                        pressedElevation = 4.dp,
                     )
                 ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_camera_alt_24),
+                        contentDescription = "Camera",
+                        modifier = Modifier.padding(end = 10.dp)
+                    )
                     Text(
-                        text = "Analisis Foto",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold
+                        text = "Kamera",
+                        fontSize = 16.sp
+                    )
+                }
+                Button(
+                    onClick = {
+                        galleryLauncher.launch(arrayOf("image/*"))
+                    },
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.size(height = 45.dp, width = 140.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(android.graphics.Color.parseColor("#276561"))
+                    )
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_insert_photo_24),
+                        contentDescription = "Camera",
+                        modifier = Modifier.padding(end = 10.dp)
+                    )
+                    Text(
+                        text = "Galeri",
+                        fontSize = 16.sp
                     )
                 }
             }
-        }
-        LaunchedEffect(showDialog) {
-            if (showDialog && imageUri != null){
-                delay(3000)
+            Spacer(Modifier.height(20.dp))
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp),
+                text = "Tips:",
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Start
+            )
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp),
+                text = "\"Pastikan foto dan pencahayaan jelas agar AI bisa bekerja optimal\"",
+                fontSize = 16.sp,
+                textAlign = TextAlign.Start
+            )
 
-//                val result = imageBitmap?.let {
-//                    classifier.classifyImage(it)
-//                } ?: "Hasil Tidak Tersedia"
+            Spacer(Modifier.weight(1f))
 
-                imageBitmap?.let {
-                    val result = classifier.classifyImage(it)
-                    val encodedUri = Uri.encode(imageUri.toString())
-                    val encodedResult = Uri.encode(result)
-                navController.navigate("result_classification/${Uri.encode(encodedUri.toString())}/${Uri.encode(encodedResult)}")
-                }
-
-                showDialog = false
-                showResult = true
-            } else {
-                showDialog = false
+            Button(
+                onClick = {
+                    showDialog = true
+                },
+                enabled = imageUri != null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+                    .height(45.dp),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(android.graphics.Color.parseColor("#276561"))
+                ),
+            ) {
+                Text(
+                    text = "Analisis Foto",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
         }
+    }
+    LaunchedEffect(showDialog) {
+        if (showDialog && imageUri != null) {
+            delay(3000)
 
-        if (showDialog) {
-            LoadingDialog()
+            Log.d("UriFromCamera", "$imageUri")
+            imageBitmap?.let {
+                val result = classifier.classifyImage(it)
+                val encodedUri = Uri.encode(imageUri.toString())
+                val encodedResult = Uri.encode(result)
+                navController.navigate(
+                    "result_classification/${Uri.encode(encodedUri.toString())}/${
+                        Uri.encode(
+                            encodedResult
+                        )
+                    }"
+                )
+            }
+
+            showDialog = false
+            showResult = true
+        } else {
+            showDialog = false
         }
     }
+
+    if (showDialog) {
+        LoadingDialog()
+    }
 }
+
+fun saveImageToMediaStore(context: Context, bitmap: Bitmap): Uri? {
+    val contentValues = ContentValues().apply {
+        put(
+            MediaStore.Images.Media.DISPLAY_NAME,
+            "Fixkan_Captured_${System.currentTimeMillis()}.jpg"
+        )
+        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+        put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Fixkan")
+    }
+
+    val uri =
+        context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+    uri?.let {
+        context.contentResolver.openOutputStream(it)?.use { outputStream ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        }
+    }
+    return uri
+}
+
 
 @Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_3A_XL)
 @Composable
