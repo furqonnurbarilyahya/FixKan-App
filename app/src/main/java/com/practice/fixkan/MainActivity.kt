@@ -29,6 +29,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.practice.fixkan.data.remote.repository.MainRepository
+import com.practice.fixkan.data.remote.retrofit.ApiConfig
 import com.practice.fixkan.navigation.NavigationItem
 import com.practice.fixkan.navigation.Screen
 import com.practice.fixkan.screen.ClassificationScreen
@@ -65,7 +67,11 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
 
     val showBottomNav = currentRoute in listOf("home", "report", "profile")
 
-    val reportViewModel: ReportViewModel = viewModel()
+//    val reportViewModel: ReportViewModel = viewModel()
+
+    val apiService = ApiConfig.ReportApiService()
+    val reportRepository = MainRepository(apiService)
+
 
     Scaffold (
         bottomBar = {
@@ -100,10 +106,10 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
             composable(Screen.ResultClassification.route) { backstackEntry ->
                 val imageUri = backstackEntry.arguments?.getString("imageUri")
                 val result = backstackEntry.arguments?.getString("result") ?: "Hasil Tidak Tersedia"
-                ResultClassificationScreen(Uri.decode(imageUri), Uri.decode(result), navController = navController)
+                ResultClassificationScreen(Uri.decode(imageUri), Uri.decode(result), navController = navController, repository = reportRepository)
             }
             composable(Screen.CreateReport.route) {
-                SubmitReportScreen(navController = navController, it)
+                SubmitReportScreen(navController = navController, backStackEntry = it, repository = reportRepository )
             }
         }
     }

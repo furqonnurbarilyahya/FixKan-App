@@ -3,6 +3,7 @@ package com.practice.fixkan.screen
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -28,13 +29,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,16 +55,23 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.practice.fixkan.MainViewModelFactory
+import com.practice.fixkan.component.ConfirmationDialog
 import com.practice.fixkan.component.EditableDropdownSelector
 import com.practice.fixkan.component.EditableDropdownSelectorProvince
+import com.practice.fixkan.component.SuccessDialog
 import com.practice.fixkan.component.TopBar
+import com.practice.fixkan.data.remote.repository.MainRepository
 import com.practice.fixkan.model.ReportData
+import com.practice.fixkan.navigation.Screen
 import com.practice.fixkan.screen.CreateReport.ReportViewModel
 import com.practice.fixkan.ui.theme.FixKanTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 @Composable
-fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStackEntry) {
+fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStackEntry, repository: MainRepository) {
 
     val context = LocalContext.current
     val jsonData = backStackEntry.arguments?.getString("reportData") ?: ""
@@ -78,12 +90,19 @@ fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStac
     var selectedDistrict = reportData.local ?: ""
     var selectedVillage = reportData.subLocal ?: ""
 
-    val reportViewModel: ReportViewModel = viewModel()
+//    val reportViewModel: ReportViewModel = viewModel()
+    val reportViewModel: ReportViewModel = viewModel(factory = MainViewModelFactory(repository))
 
     val provinces by reportViewModel.provinces.collectAsState()
     val regencies by reportViewModel.regencies.collectAsState()
     val districts by reportViewModel.districts.collectAsState()
     val villages by reportViewModel.villages.collectAsState()
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    var showConfirmationDialog by remember { mutableStateOf(false) }
+    var showSuccesDialog by remember { mutableStateOf(false) }
 
     val imageUri = reportData.photoUri
     val bitmap = remember(imageUri) {
@@ -109,7 +128,8 @@ fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStac
     Scaffold(
         topBar = {
             TopBar("Submit Laporan", navController = navController)
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -125,7 +145,8 @@ fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStac
                 AsyncImage(
                     model = it,
                     contentDescription = "Classified Image",
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(top = 12.dp),
                     contentScale = ContentScale.Crop,
                     alignment = Alignment.Center
@@ -266,7 +287,22 @@ fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStac
             Spacer(Modifier.weight(1f))
 
             Button(
-                onClick = { /* Simpan laporan */ },
+                onClick = {
+                    if (
+                        selectedProvince.isEmpty() ||
+                        selectedRegency.isEmpty() ||
+                        selectedDistrict.isEmpty() ||
+                        selectedVillage.isEmpty() ||
+                        detailAddress.isEmpty() ||
+                        description.isEmpty()
+                    ) {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar("Pastikan semua form terisi")
+                        }
+                    } else {
+                        showConfirmationDialog = true
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(45.dp),
@@ -284,6 +320,39 @@ fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStac
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold
                 )
+            }
+
+
+            if (showConfirmationDialog) {
+                ConfirmationDialog(
+                    onDismiss = { showConfirmationDialog = false},
+                    onConfirm = {
+                        reportViewModel.uploadReport(
+                            imageReport = bitmap!!,
+                            typeReport = typeReport,
+                            userId = "b077733d-e727-4cd5-8a6c-88f98f59d7b1",
+                            description = description,
+                            province = selectedProvince,
+                            district = selectedDistrict,
+                            subdistrict = selectedRegency,
+                            village = selectedVillage,
+                            addressDetail = detailAddress,
+                            longitude = longitude,
+                            latitude = latitude,
+                        )
+                        showConfirmationDialog = false
+                        showSuccesDialog = true
+                        coroutineScope.launch {
+                            delay(3000)
+                            showSuccesDialog = false
+                            navController.navigate(Screen.Home.route)
+                        }
+                    }
+                )
+            }
+
+            if (showSuccesDialog) {
+                SuccessDialog()
             }
         }
     }

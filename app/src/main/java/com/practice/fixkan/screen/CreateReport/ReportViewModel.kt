@@ -1,13 +1,17 @@
 package com.practice.fixkan.screen.CreateReport
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.practice.fixkan.data.Result
+import com.practice.fixkan.data.remote.repository.MainRepository
 import com.practice.fixkan.data.remote.retrofit.ApiConfig
 import com.practice.fixkan.model.ReportData
+import com.practice.fixkan.model.response.CreateReportResponse
 import com.practice.fixkan.model.response.DistrictResponseItem
 import com.practice.fixkan.model.response.ProvinceResponseItem
 import com.practice.fixkan.model.response.RegenciesResponseItem
@@ -17,7 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ReportViewModel : ViewModel() {
+class ReportViewModel(private val repository: MainRepository) : ViewModel() {
     private val _reportData = MutableLiveData<ReportData>()
     val reportData: LiveData<ReportData> = _reportData
 
@@ -32,6 +36,9 @@ class ReportViewModel : ViewModel() {
 
     private val _villages = MutableStateFlow<List<VillageResponseItem>>(emptyList())
     val villages: StateFlow<List<VillageResponseItem>> = _villages
+
+    private val _uploadState = MutableLiveData<Result<CreateReportResponse>>()
+    val uploadState: LiveData<Result<CreateReportResponse>> = _uploadState
 
     fun setReportData(
         typeReport: String,
@@ -106,4 +113,40 @@ class ReportViewModel : ViewModel() {
     }
 
 
+    // Post Report
+    fun uploadReport(
+        imageReport: Bitmap,
+        userId: String,
+        typeReport: String,
+        description: String,
+        province: String,
+        district: String,
+        subdistrict: String,
+        village: String,
+        addressDetail: String,
+        longitude: String,
+        latitude: String,
+    ) {
+        viewModelScope.launch {
+            try {
+                val response = repository.createReport(
+                    imageReport = imageReport,
+                    userId = userId,
+                    typeReport = typeReport,
+                    description = description,
+                    province = province,
+                    district = district,
+                    subdistrict = subdistrict,
+                    village = village,
+                    addressDetail = addressDetail,
+                    longitude = longitude,
+                    latitude = latitude
+                )
+                _uploadState.postValue(Result.Success(response))
+            } catch (e: Exception) {
+                _uploadState.postValue(Result.Error(e.toString()))
+            }
+
+        }
+    }
 }

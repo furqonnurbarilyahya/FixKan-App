@@ -29,11 +29,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -48,20 +51,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.practice.fixkan.MainViewModelFactory
+import com.practice.fixkan.component.AddLocationDialog
 import com.practice.fixkan.component.TopBar
+import com.practice.fixkan.data.remote.repository.MainRepository
 import com.practice.fixkan.model.ReportData
 import com.practice.fixkan.navigation.Screen
 import com.practice.fixkan.screen.CreateReport.ReportViewModel
 import com.practice.fixkan.ui.theme.FixKanTheme
 import com.practice.fixkan.utils.getCurrentLocation
+import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Composable
-fun ResultClassificationScreen(imageUri: String?, result: String, navController: NavController) {
+fun ResultClassificationScreen(imageUri: String?, result: String, navController: NavController, repository: MainRepository) {
 
     val context = LocalContext.current
     var succesDialog by rememberSaveable { mutableStateOf(false) }
@@ -71,7 +79,10 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
     var longitude by rememberSaveable { mutableStateOf<Double?>(null) }
     var address by rememberSaveable { mutableStateOf<String?>(null) }
 
-    val reportViewModel = remember { ReportViewModel() }
+    val reportViewModel: ReportViewModel = viewModel(factory = MainViewModelFactory(repository))
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     var locationPermissionGranted by rememberSaveable { mutableStateOf(false) }
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -93,7 +104,10 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
                     errorDialog = true
                 })
         } else {
-            Toast.makeText(context, "Akses lokasi belum dizinkan", Toast.LENGTH_LONG).show()
+//            Toast.makeText(context, "Akses lokasi belum dizinkan", Toast.LENGTH_LONG).show()
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar("Akses lokasi belum dizinkan")
+            }
             errorDialog = true
         }
     }
@@ -119,7 +133,8 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
     Scaffold(
         topBar = {
             TopBar(title = "Hasil Klasifikasi", navController = navController)
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) {
         Column(
             Modifier
@@ -159,7 +174,10 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
             Button(
                 onClick = {
                     Log.d("LocationDebug", "Button clicked, trying to get location...")
-                    Toast.makeText(context, "Mengambil Lokasi...", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(context, "Mengambil Lokasi...", Toast.LENGTH_SHORT).show()
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("Mengambil Lokasi...")
+                    }
                     if (ActivityCompat.checkSelfPermission(
                             context, Manifest.permission.ACCESS_FINE_LOCATION
                         ) == PackageManager.PERMISSION_GRANTED
@@ -258,24 +276,12 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
             }
             // Dialog untuk menampilkan latitude, longitude, dan alamat
             if (succesDialog) {
-                AlertDialog(
-                    onDismissRequest = { succesDialog = false },
-                    title = { Text(text = "Berhasil Menambahkan Lokasi") },
-                    text = {
-                        Column {
-                            Text(text = "Latitude: $latitude")
-                            Text(text = "Longitude: $longitude")
-                            Text(text = "Alamat: $address")
-                        }
-                    },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                succesDialog = false
-                            } // Tutup dialog saat tombol "Lanjutkan" ditekan
-                        ) {
-                            Text("Lanjut")
-                        }
+                AddLocationDialog(
+                    latitude = latitude,
+                    longitude = longitude,
+                    address = address,
+                    onDismiss = {
+                        succesDialog = false
                     }
                 )
             }
@@ -372,7 +378,11 @@ fun fetchLocation(
     onSuccess: (Double, Double, String, String, String, String) -> Unit,
     onError: () -> Unit
 ) {
-    Toast.makeText(context, "Mengambil lokasi...", Toast.LENGTH_SHORT).show()
+//    Toast.makeText(context, "Mengambil lokasi...", Toast.LENGTH_SHORT).show()
+//
+//    coroutineScope.launch {
+//        snackbarHostState.showSnackbar("Mengambil lokasi...")
+//    }
 
     getCurrentLocation(context) { lat, lon, adminArea, subAdminArea, locality, subLocality ->
         if (lat != null &&
@@ -408,10 +418,11 @@ fun fetchLocation(
 @Composable
 private fun ResultClassificationScreenPreview() {
     FixKanTheme {
-        ResultClassificationScreen(
-            null,
-            "Hasil Klasifikasi",
-            navController = rememberNavController()
-        )
+//        ResultClassificationScreen(
+//            null,
+//            "Hasil Klasifikasi",
+//            navController = rememberNavController(),
+//            repository =
+//        )
     }
 }
