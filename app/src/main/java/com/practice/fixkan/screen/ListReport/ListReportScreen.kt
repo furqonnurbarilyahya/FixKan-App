@@ -173,7 +173,7 @@ fun ListReportItem(
                                 contentDescription = "Location Report"
                             )
                             Text(
-                                text = it.region
+                                text = it.province
                             )
                         }
                         Spacer(Modifier.height(12.dp))
