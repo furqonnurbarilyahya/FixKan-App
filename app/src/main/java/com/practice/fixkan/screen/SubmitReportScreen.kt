@@ -85,10 +85,10 @@ fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStac
     var latitude = reportData.lat.toString()
     var longitude = reportData.long.toString()
 
-    var selectedProvince = reportData.admArea ?: ""
-    var selectedRegency = reportData.subAdmArea ?: ""
-    var selectedDistrict = reportData.local ?: ""
-    var selectedVillage = reportData.subLocal ?: ""
+    var selectedProvince = reportData.admArea?.uppercase() ?: ""
+    var selectedRegency = reportData.subAdmArea?.uppercase() ?: ""
+    var selectedDistrict = reportData.local?.uppercase()?.replace(Regex("(?i)Kecamatan "), "") ?: ""
+    var selectedVillage = reportData.subLocal?.uppercase() ?: ""
 
 //    val reportViewModel: ReportViewModel = viewModel()
     val reportViewModel: ReportViewModel = viewModel(factory = MainViewModelFactory(repository))
@@ -333,8 +333,8 @@ fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStac
                             userId = "b077733d-e727-4cd5-8a6c-88f98f59d7b1",
                             description = description,
                             province = selectedProvince,
-                            district = selectedDistrict,
-                            subdistrict = selectedRegency,
+                            district = selectedRegency,
+                            subdistrict = selectedDistrict,
                             village = selectedVillage,
                             addressDetail = detailAddress,
                             longitude = longitude,

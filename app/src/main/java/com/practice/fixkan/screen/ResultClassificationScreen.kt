@@ -56,7 +56,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.practice.fixkan.MainViewModelFactory
-import com.practice.fixkan.component.AddLocationDialog
+import com.practice.fixkan.component.AddLocationFailed
+import com.practice.fixkan.component.AddLocationSucces
 import com.practice.fixkan.component.TopBar
 import com.practice.fixkan.data.remote.repository.MainRepository
 import com.practice.fixkan.model.ReportData
@@ -276,7 +277,7 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
             }
             // Dialog untuk menampilkan latitude, longitude, dan alamat
             if (succesDialog) {
-                AddLocationDialog(
+                AddLocationSucces(
                     latitude = latitude,
                     longitude = longitude,
                     address = address,
@@ -287,25 +288,9 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
             }
 
             if (errorDialog) {
-                AlertDialog(
-                    onDismissRequest = { errorDialog = false },
-                    title = { Text(text = "Gagal Menambahkan Lokasi") },
-                    text = {
-                        Text(
-                            text = "- Pastikan bahwa izin lokasi untuk aplikasi ini telah diberikan. Anda dapat mengaturnya melalui: Info Aplikasi → Permission → Location → Izinkan\n\n" +
-                                    "Catatan:\n" +
-                                    "- Jika izin sudah diberikan, coba klik tombol 'Tambahkan Lokasi' lagi"
-                        )
-                    },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                Log.d("LocationDebug", "Lanjutkan diklik, menutup dialog gagal...")
-                                errorDialog = false
-                            }
-                        ) {
-                            Text("Oke")
-                        }
+                AddLocationFailed(
+                    onDismiss = {
+                        errorDialog = false
                     }
                 )
             }

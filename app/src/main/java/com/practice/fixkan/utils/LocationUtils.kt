@@ -119,7 +119,7 @@ fun getAddressFromLocation(
     context: Context,
     onAddressFound: (String?, String?, String?, String?) -> Unit // Mengembalikan 4 nilai
 ) {
-    val geocoder = Geocoder(context, Locale.getDefault())
+    val geocoder = Geocoder(context, Locale("id"))
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         geocoder.getFromLocation(latitude, longitude, 1, object : Geocoder.GeocodeListener {
