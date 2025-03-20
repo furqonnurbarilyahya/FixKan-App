@@ -1,5 +1,7 @@
 package com.practice.fixkan
 
+import android.Manifest
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,21 +21,34 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.app.ActivityCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.practice.fixkan.data.remote.repository.MainRepository
+import com.practice.fixkan.data.remote.retrofit.ApiConfig
 import com.practice.fixkan.navigation.NavigationItem
 import com.practice.fixkan.navigation.Screen
+import com.practice.fixkan.screen.ClassificationScreen
+import com.practice.fixkan.screen.CreateReport.ReportViewModel
 import com.practice.fixkan.screen.HomeScreen
 import com.practice.fixkan.screen.ListReport.ListReportScreen
+import com.practice.fixkan.screen.ResultClassificationScreen
+import com.practice.fixkan.screen.SubmitReportScreen
 import com.practice.fixkan.ui.theme.FixKanTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            1
+        )
         setContent {
             FixKanTheme {
                 FixKanApp()
@@ -47,9 +62,22 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
 
     val context = LocalContext.current
 
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val showBottomNav = currentRoute in listOf("home", "report", "profile")
+
+//    val reportViewModel: ReportViewModel = viewModel()
+
+    val apiService = ApiConfig.ReportApiService()
+    val reportRepository = MainRepository(apiService)
+
+
     Scaffold (
         bottomBar = {
+            if (showBottomNav) {
             BottomBar(navController)
+            }
         },
         modifier = Modifier.fillMaxSize()
     ) { innerpadding ->
@@ -59,10 +87,29 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
             modifier = Modifier.padding(innerpadding)
         ) {
             composable(Screen.Home.route) {
-                HomeScreen()
+                HomeScreen(navController = navController)
             }
             composable(Screen.Report.route) {
                 ListReportScreen(context)
+            }
+            composable(Screen.Classification.route) {
+                ClassificationScreen(navController = navController)
+            }
+//            composable(Screen.ResultClassification.route) {
+//                ResultClassificationScreen()
+//            }
+//            composable("result_classification/{imageUri}/{result}") { backstackEntry ->
+//                val imageUri = backstackEntry.arguments?.getString("imageuUri")
+//                val result = backstackEntry.arguments?.getString("result") ?: "Hasil Tidak Tersedia"
+//                ResultClassificationScreen(imageUri, result)
+//            }
+            composable(Screen.ResultClassification.route) { backstackEntry ->
+                val imageUri = backstackEntry.arguments?.getString("imageUri")
+                val result = backstackEntry.arguments?.getString("result") ?: "Hasil Tidak Tersedia"
+                ResultClassificationScreen(Uri.decode(imageUri), Uri.decode(result), navController = navController, repository = reportRepository)
+            }
+            composable(Screen.CreateReport.route) {
+                SubmitReportScreen(navController = navController, backStackEntry = it, repository = reportRepository )
             }
         }
     }
