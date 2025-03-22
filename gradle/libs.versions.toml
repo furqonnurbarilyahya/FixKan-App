@@ -22,6 +22,7 @@ litertSupportApi = "1.1.2"
 litert = "1.1.2"
 navigationCompose = "2.8.8"
 runtimeLivedata = "1.7.8"
+appcompat = "1.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -53,6 +54,7 @@ litert-support-api = { group = "com.google.ai.edge.litert", name = "litert-suppo
 litert = { group = "com.google.ai.edge.litert", name = "litert", version.ref = "litert" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

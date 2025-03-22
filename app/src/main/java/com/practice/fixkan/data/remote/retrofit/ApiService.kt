@@ -13,10 +13,20 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
-    @GET("reports?sortBy=updatedAt&order=DESC")
-    suspend fun getListReport(): ListReportResponse
+    @GET("reports")
+    suspend fun getListReport(
+        @Query("type_report") typeReport: String? = null,
+        @Query("province") province: String? = null,
+        @Query("district") district: String? = null,
+        @Query("subdistrict") subdistrict: String? = null,
+        @Query("village") village: String? = null,
+        @Query("sortBy") sortBy: String? = "createdAt",
+        @Query("order") orderBy: String? = "DESC",
+
+    ): ListReportResponse
 
     @GET("provinces.json")
     suspend fun getProvince(): List<ProvinceResponseItem>

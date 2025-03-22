@@ -17,7 +17,7 @@ import retrofit2.http.Query
 import java.io.File
 import kotlin.concurrent.Volatile
 
-class MainRepository (private val apiService: ApiService) {
+class MainRepository(private val apiService: ApiService) {
 
     suspend fun createReport(
         imageReport: Bitmap,
@@ -59,25 +59,35 @@ class MainRepository (private val apiService: ApiService) {
         )
     }
 
-    // UI State untuk List Report
-    private val _listReportState = MutableStateFlow<UiState<List<DataItem>>>(UiState.Loading)
-    val listReportState: StateFlow<UiState<List<DataItem>>> get() = _listReportState
-
-    suspend fun getListReport() {
-        try {
-            val response = apiService.getListReport()
-            _listReportState.value = UiState.Success(response.data)
-            Log.d("API_SUCCESS", "Fetched ${response.data.size} reports")
+    suspend fun getListReport(
+        typeReport: String? = null,
+        province: String? = null,
+        district: String? = null,
+        subdistrict: String? = null,
+        village: String? = null,
+        sortBy: String? = "createdAt",
+        orderBy: String? = "ASC"
+    ): Result<List<DataItem>> {
+        return try {
+            val response = apiService.getListReport(
+                typeReport,
+                province,
+                district,
+                subdistrict,
+                village,
+                sortBy,
+                orderBy
+            )
+            Result.success(response.data)
         } catch (e: Exception) {
-            _listReportState.value = UiState.Error(e.message ?: "Unknown error")
-            Log.e("API_ERROR", "Error fetching reports: ${e.message}")
+            Result.failure(e)
         }
     }
 
     companion object {
         @Volatile
         private var instance: MainRepository? = null
-        fun getInstance (apiService: ApiService): MainRepository =
+        fun getInstance(apiService: ApiService): MainRepository =
             instance ?: synchronized(this) {
                 instance ?: MainRepository(apiService)
             }.also { instance == it }

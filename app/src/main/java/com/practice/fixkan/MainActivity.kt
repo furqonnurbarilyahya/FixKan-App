@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -34,9 +35,9 @@ import com.practice.fixkan.data.remote.retrofit.ApiConfig
 import com.practice.fixkan.navigation.NavigationItem
 import com.practice.fixkan.navigation.Screen
 import com.practice.fixkan.screen.ClassificationScreen
-import com.practice.fixkan.screen.CreateReport.ReportViewModel
 import com.practice.fixkan.screen.HomeScreen
-import com.practice.fixkan.screen.ListReport.ListReportScreen
+import com.practice.fixkan.screen.listReport.ListReportScreen
+import com.practice.fixkan.screen.listReport.ListReportViewModel
 import com.practice.fixkan.screen.ResultClassificationScreen
 import com.practice.fixkan.screen.SubmitReportScreen
 import com.practice.fixkan.ui.theme.FixKanTheme
@@ -49,6 +50,7 @@ class MainActivity : ComponentActivity() {
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
             1
         )
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         setContent {
             FixKanTheme {
                 FixKanApp()
@@ -67,10 +69,9 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
 
     val showBottomNav = currentRoute in listOf("home", "report", "profile")
 
-//    val reportViewModel: ReportViewModel = viewModel()
-
     val apiService = ApiConfig.ReportApiService()
     val reportRepository = MainRepository(apiService)
+    val listReportViewModel: ListReportViewModel = viewModel(factory = MainViewModelFactory(reportRepository))
 
 
     Scaffold (
@@ -90,7 +91,7 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
                 HomeScreen(navController = navController)
             }
             composable(Screen.Report.route) {
-                ListReportScreen(context)
+                ListReportScreen(context, listReportViewModel = listReportViewModel, repository = reportRepository)
             }
             composable(Screen.Classification.route) {
                 ClassificationScreen(navController = navController)

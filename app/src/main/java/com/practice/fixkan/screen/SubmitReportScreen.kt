@@ -3,7 +3,6 @@ package com.practice.fixkan.screen
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -36,7 +35,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -64,7 +62,7 @@ import com.practice.fixkan.component.TopBar
 import com.practice.fixkan.data.remote.repository.MainRepository
 import com.practice.fixkan.model.ReportData
 import com.practice.fixkan.navigation.Screen
-import com.practice.fixkan.screen.CreateReport.ReportViewModel
+import com.practice.fixkan.screen.createReport.ReportViewModel
 import com.practice.fixkan.ui.theme.FixKanTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

@@ -3,8 +3,8 @@ package com.practice.fixkan
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.practice.fixkan.data.remote.repository.MainRepository
-import com.practice.fixkan.screen.CreateReport.ReportViewModel
-import com.practice.fixkan.screen.ListReport.ListReportViewModel
+import com.practice.fixkan.screen.createReport.ReportViewModel
+import com.practice.fixkan.screen.listReport.ListReportViewModel
 
 class MainViewModelFactory (private val mainRepository: MainRepository): ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.appcompat)
 //    implementation(libs.litert.support.api)
 //    implementation(libs.litert)
     testImplementation(libs.junit)

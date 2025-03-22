@@ -1,7 +1,6 @@
-package com.practice.fixkan.screen.CreateReport
+package com.practice.fixkan.screen.createReport
 
 import android.graphics.Bitmap
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -57,7 +56,7 @@ class ReportViewModel(private val repository: MainRepository) : ViewModel() {
         viewModelScope.launch(Dispatchers.Main) {
             _reportData.value = ReportData(
                 typeReport = typeReport,
-                photoUri = photoUri.toString(),
+                photoUri = photoUri,
                 lat = lat,
                 long = long,
                 admArea = admArea,

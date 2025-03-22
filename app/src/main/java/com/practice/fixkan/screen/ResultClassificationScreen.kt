@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -24,7 +23,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -53,7 +51,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.practice.fixkan.MainViewModelFactory
 import com.practice.fixkan.component.AddLocationFailed
@@ -62,7 +59,7 @@ import com.practice.fixkan.component.TopBar
 import com.practice.fixkan.data.remote.repository.MainRepository
 import com.practice.fixkan.model.ReportData
 import com.practice.fixkan.navigation.Screen
-import com.practice.fixkan.screen.CreateReport.ReportViewModel
+import com.practice.fixkan.screen.createReport.ReportViewModel
 import com.practice.fixkan.ui.theme.FixKanTheme
 import com.practice.fixkan.utils.getCurrentLocation
 import kotlinx.coroutines.launch
