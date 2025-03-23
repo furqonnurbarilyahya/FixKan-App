@@ -5,12 +5,10 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
-import android.location.Location
 import android.os.Build
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -18,100 +16,6 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import java.io.IOException
 import java.util.Locale
-
-//fun getAddressFromLocation(
-//    latitude: Double,
-//    longitude: Double,
-//    context: Context,
-//    onAddressFound: (String) -> Unit
-//) {
-//    val geocoder = Geocoder(context, Locale.getDefault())
-//
-//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//        geocoder.getFromLocation(latitude, longitude, 1, object : Geocoder.GeocodeListener {
-//            override fun onGeocode(addresses: MutableList<Address>) {
-//                if (addresses.isNotEmpty()) {
-//                    val address = addresses[0]
-//                    val result = "${address.adminArea}, ${address.subAdminArea}, ${address.locality}, ${address.subLocality}"
-//                    Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: $result")
-//                    onAddressFound(result)
-//                } else {
-//                    Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: Not Found")
-//                    onAddressFound("Alamat tidak ditemukan")
-//                }
-//            }
-//
-//            override fun onError(errorMessage: String?) {
-//                Log.e("LocationDebug", "Geocoder error: $errorMessage")
-//                onAddressFound("Gagal mendapatkan alamat")
-//            }
-//        })
-//    } else {
-//        try {
-//            val addresses = geocoder.getFromLocation(latitude, longitude, 1)
-//            if (!addresses.isNullOrEmpty()) {
-//                val address = addresses[0]
-//                val result = "${address.adminArea}, ${address.subAdminArea}, ${address.locality}, ${address.subLocality}"
-//                Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: $result")
-//                onAddressFound(result)
-//            } else {
-//                Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: Not Found")
-//                onAddressFound("Alamat tidak ditemukan")
-//            }
-//        } catch (e: IOException) {
-//            Log.e("LocationDebug", "Gagal mendapatkan alamat: ${e.message}")
-//            onAddressFound("Gagal mendapatkan alamat")
-//        }
-//    }
-//}
-
-//fun getCurrentLocation(context: Context, onLocationRetrieved: (Double?, Double?, String?) -> Unit) {
-
-
-// Ini Baruu
-//fun getAddressFromLocation(
-//    latitude: Double,
-//    longitude: Double,
-//    context: Context,
-//    onAddressFound: (Address?) -> Unit // Mengembalikan Address, bukan String
-//) {
-//    val geocoder = Geocoder(context, Locale.getDefault())
-//
-//    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//        geocoder.getFromLocation(latitude, longitude, 1, object : Geocoder.GeocodeListener {
-//            override fun onGeocode(addresses: MutableList<Address>) {
-//                if (addresses.isNotEmpty()) {
-//                    val address = addresses[0] // Kirim Address langsung
-//                    Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: $address")
-//                    onAddressFound(address) // Kirim Address, bukan String
-//                } else {
-//                    Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: Not Found")
-//                    onAddressFound(null) // Tidak ditemukan
-//                }
-//            }
-//
-//            override fun onError(errorMessage: String?) {
-//                Log.e("LocationDebug", "Geocoder error: $errorMessage")
-//                onAddressFound(null)
-//            }
-//        })
-//    } else {
-//        try {
-//            val addresses = geocoder.getFromLocation(latitude, longitude, 1)
-//            if (!addresses.isNullOrEmpty()) {
-//                val address = addresses[0]
-//                Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: $address")
-//                onAddressFound(address)
-//            } else {
-//                Log.d("LocationDebug", "Lat: $latitude, Lon: $longitude, Address: Not Found")
-//                onAddressFound(null)
-//            }
-//        } catch (e: IOException) {
-//            Log.e("LocationDebug", "Gagal mendapatkan alamat: ${e.message}")
-//            onAddressFound(null)
-//        }
-//    }
-//}
 
 fun getAddressFromLocation(
     latitude: Double,
@@ -153,6 +57,7 @@ fun getAddressFromLocation(
         })
     } else {
         try {
+            @Suppress("DEPRECATION")
             val addresses = geocoder.getFromLocation(latitude, longitude, 1)
             if (!addresses.isNullOrEmpty()) {
                 val address = addresses[0]

@@ -10,7 +10,6 @@ import android.os.Looper
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -55,6 +54,7 @@ import coil.compose.AsyncImage
 import com.practice.fixkan.MainViewModelFactory
 import com.practice.fixkan.component.AddLocationFailed
 import com.practice.fixkan.component.AddLocationSucces
+import com.practice.fixkan.component.LocationInfoDialogButton
 import com.practice.fixkan.component.TopBar
 import com.practice.fixkan.data.remote.repository.MainRepository
 import com.practice.fixkan.model.ReportData
@@ -67,7 +67,12 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Composable
-fun ResultClassificationScreen(imageUri: String?, result: String, navController: NavController, repository: MainRepository) {
+fun ResultClassificationScreen(
+    imageUri: String?,
+    result: String,
+    navController: NavController,
+    repository: MainRepository
+) {
 
     val context = LocalContext.current
     var succesDialog by rememberSaveable { mutableStateOf(false) }
@@ -139,7 +144,6 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
                 .fillMaxSize()
                 .padding(it)
                 .padding(12.dp)
-                .background(color = Color(android.graphics.Color.parseColor("#E7FFF2")))
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -199,14 +203,16 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
                                     typeReport = result,
                                     photoUri = Uri.encode(imageUri.toString()),
                                     lat = lat,
-                                    long = lon,
-                                    admArea = adminArea,
-                                    subAdmArea = subAdminArea,
-                                    local = locality,
-                                    subLocal = subLocality
+                                    long = lon
+//                                    admArea = adminArea,
+//                                    subAdmArea = subAdminArea,
+//                                    local = locality,
+//                                    subLocal = subLocality
                                 )
                                 // Logging untuk memastikan data berhasil dikirim ke ViewModel
-                                Log.d("LocationDebug", "Data set to ViewModel: photo: $imageUri typeReport=$result lat=$lat, lon=$lon, " +
+                                Log.d(
+                                    "LocationDebug",
+                                    "Data set to ViewModel: photo: $imageUri typeReport=$result lat=$lat, lon=$lon, " +
                                             "adminArea=$adminArea, subAdminArea=$subAdminArea, " +
                                             "locality=$locality, subLocality=$subLocality"
                                 )
@@ -222,7 +228,8 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
                                         ) {
                                             latitude = newLat
                                             longitude = newLon
-                                            address = "$newAdmin, $newSubAdmin, $newLocal, $newSubLocal"
+                                            address =
+                                                "$newAdmin, $newSubAdmin, $newLocal, $newSubLocal"
                                             succesDialog = true
                                             errorDialog = false
 
@@ -231,11 +238,11 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
                                                 typeReport = result,
                                                 photoUri = Uri.encode(imageUri.toString()),
                                                 lat = newLat,
-                                                long = newLon,
-                                                admArea = newAdmin,
-                                                subAdmArea = newSubAdmin,
-                                                local = newLocal,
-                                                subLocal = newSubLocal
+                                                long = newLon
+//                                                admArea = newAdmin,
+//                                                subAdmArea = newSubAdmin,
+//                                                local = newLocal,
+//                                                subLocal = newSubLocal
                                             )
                                         } else {
                                             errorDialog = true
@@ -266,12 +273,32 @@ fun ResultClassificationScreen(imageUri: String?, result: String, navController:
                     tint = Color.Black
                 )
                 Text(
-                    text = "Tambahkan Lokasi",
+                    text = "Simpan Koordinat",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.Black
                 )
             }
+
+            LocationInfoDialogButton()
+
+            Spacer(Modifier.height(20.dp))
+
+            Text(
+                text = "Bagaimana jika AI salah mengklasifikasikan tipe laporan?",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                textAlign = TextAlign.Start
+            )
+
+            Text(
+                text = "Pengguna dapat mengubah tipe laporan secara manual di halaman Buat Laporan dengan cara:\n\n" +
+                        "1. Klik tombol 'Laporkan' yang tersedia dibawah;\n" +
+                        "2. Selanjutnya pilih opsi tipe laporan yang sesuai dengan foto laporan yang akan diunggah."
+            )
+
             // Dialog untuk menampilkan latitude, longitude, dan alamat
             if (succesDialog) {
                 AddLocationSucces(

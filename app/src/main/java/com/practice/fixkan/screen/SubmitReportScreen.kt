@@ -55,8 +55,8 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.practice.fixkan.MainViewModelFactory
 import com.practice.fixkan.component.ConfirmationDialog
-import com.practice.fixkan.component.EditableDropdownSelector
-import com.practice.fixkan.component.EditableDropdownSelectorProvince
+import com.practice.fixkan.component.EditableDropdownSelectorFL
+import com.practice.fixkan.component.EditableDropdownSelectorProvinceFL
 import com.practice.fixkan.component.SuccessDialog
 import com.practice.fixkan.component.TopBar
 import com.practice.fixkan.data.remote.repository.MainRepository
@@ -69,7 +69,11 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 @Composable
-fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStackEntry, repository: MainRepository) {
+fun SubmitReportScreen(
+    navController: NavController,
+    backStackEntry: NavBackStackEntry,
+    repository: MainRepository
+) {
 
     val context = LocalContext.current
     val jsonData = backStackEntry.arguments?.getString("reportData") ?: ""
@@ -83,12 +87,27 @@ fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStac
     var latitude = reportData.lat.toString()
     var longitude = reportData.long.toString()
 
-    var selectedProvince = reportData.admArea?.uppercase() ?: ""
-    var selectedRegency = reportData.subAdmArea?.uppercase() ?: ""
-    var selectedDistrict = reportData.local?.uppercase()?.replace(Regex("(?i)Kecamatan "), "") ?: ""
-    var selectedVillage = reportData.subLocal?.uppercase() ?: ""
+    var selectedProvince by remember {
+        mutableStateOf<String?>(
+            reportData.admArea?.uppercase() ?: ""
+        )
+    }
+    var selectedRegency by remember {
+        mutableStateOf<String?>(
+            reportData.subAdmArea?.uppercase() ?: ""
+        )
+    }
+    var selectedDistrict by remember {
+        mutableStateOf<String?>(
+            reportData.local?.uppercase()?.replace(Regex("(?i)Kecamatan "), "") ?: ""
+        )
+    }
+    var selectedVillage by remember {
+        mutableStateOf<String?>(
+            reportData.subLocal?.uppercase() ?: ""
+        )
+    }
 
-//    val reportViewModel: ReportViewModel = viewModel()
     val reportViewModel: ReportViewModel = viewModel(factory = MainViewModelFactory(repository))
 
     val provinces by reportViewModel.provinces.collectAsState()
@@ -125,7 +144,7 @@ fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStac
 
     Scaffold(
         topBar = {
-            TopBar("Submit Laporan", navController = navController)
+            TopBar("Buat Laporan", navController = navController)
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
@@ -153,7 +172,7 @@ fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStac
 
             Spacer(Modifier.height(12.dp))
 
-            ReportTypeDropdown(typeReport = typeReport, onTypeSelected = {typeReport = it})
+            ReportTypeDropdown(typeReport = typeReport, onTypeSelected = { typeReport = it })
 
             Spacer(Modifier.height(12.dp))
 
@@ -183,71 +202,134 @@ fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStac
 
             Spacer(Modifier.height(12.dp))
 
+//            // Dropdown Provinsi
+//            EditableDropdownSelectorProvince(
+//                label = "Provinsi",
+//                options = provinces.map { it.name },
+//                selectedOption = selectedProvince,
+//                onOptionSelected = { selectedName ->
+//                    val selected = provinces.find { it.name == selectedName }
+//                    selectedProvince = selected?.name ?: "" // Simpan nama provinsi
+//                    selectedRegency = "" // Reset kabupaten/kota saat provinsi berubah
+//                    selectedDistrict = "" // Reset kecamatan
+//                    selectedVillage = "" // Reset desa
+//                    selected?.let { reportViewModel.fetchRegencies(it.id) } // Ambil kabupaten berdasarkan provinsi
+//                }
+//            )
+//
+//            // Dropdown Kabupaten/Kota
+//            EditableDropdownSelector(
+//                    label = "Kabupaten/Kota",
+//                    previousForm = "Provinsi",
+//                    options = regencies.map { it.name },
+//                    selectedOption = selectedRegency,
+//                    onOptionSelected = { selectedName ->
+//                        val selected = regencies.find { it.name == selectedName }
+//                        selectedRegency = selected?.name ?: ""
+//                        selectedDistrict = "" // Reset kecamatan
+//                        selectedVillage = "" // Reset desa
+//                        selected?.let { reportViewModel.fetchDistricts(it.id) } // Ambil kecamatan berdasarkan kabupaten
+//                    }
+//                )
+//
+//            // Dropdown Kecamatan
+//            EditableDropdownSelector(
+//                    label = "Kecamatan",
+//                    previousForm = "Kabupaten",
+//                    options = districts.map { it.name },
+//                    selectedOption = selectedDistrict,
+//                    onOptionSelected = { selectedName ->
+//                        val selected = districts.find { it.name == selectedName }
+//                        selectedDistrict = selected?.name ?: ""
+//                        selectedVillage = "" // Reset desa
+//                        selected?.let { reportViewModel.fetchVillages(it.id) } // Ambil desa berdasarkan kecamatan
+//                    }
+//                )
+//
+//            // Dropdown Desa
+//            EditableDropdownSelector(
+//                    label = "Kelurahan/Desa",
+//                    previousForm = "Kecamatan",
+//                    options = villages.map { it.name },
+//                    selectedOption = selectedVillage,
+//                    onOptionSelected = { selectedName ->
+//                        val selected = villages.find { it.name == selectedName }
+//                        selectedVillage = selected?.name ?: "" // Simpan nama desa
+//                    }
+//                )
             // Dropdown Provinsi
-            EditableDropdownSelectorProvince(
+            EditableDropdownSelectorProvinceFL(
                 label = "Provinsi",
                 options = provinces.map { it.name },
                 selectedOption = selectedProvince,
                 onOptionSelected = { selectedName ->
                     val selected = provinces.find { it.name == selectedName }
-                    selectedProvince = selected?.name ?: "" // Simpan nama provinsi
-                    selectedRegency = "" // Reset kabupaten/kota saat provinsi berubah
-                    selectedDistrict = "" // Reset kecamatan
-                    selectedVillage = "" // Reset desa
-                    selected?.let { reportViewModel.fetchRegencies(it.id) } // Ambil kabupaten berdasarkan provinsi
-                }
+
+                    selectedProvince = selected?.name ?: selectedName
+
+                    if (selected != null) {
+                        selectedRegency = null
+                        selectedDistrict = null
+                        selectedVillage = null
+                        reportViewModel.fetchRegencies(selected.id) // Ambil kabupaten/kota berdasarkan provinsi
+                    }
+                },
+                onUserStartsTyping = { reportViewModel.fetchProvinces() } // Hanya fetch saat user mulai mengetik
             )
 
-            // Dropdown Kabupaten/Kota
-            EditableDropdownSelector(
-                    label = "Kabupaten/Kota",
-                    previousForm = "Provinsi",
-                    options = regencies.map { it.name },
-                    selectedOption = selectedRegency,
-                    onOptionSelected = { selectedName ->
-                        val selected = regencies.find { it.name == selectedName }
-                        selectedRegency = selected?.name ?: ""
-                        selectedDistrict = "" // Reset kecamatan
-                        selectedVillage = "" // Reset desa
-                        selected?.let { reportViewModel.fetchDistricts(it.id) } // Ambil kecamatan berdasarkan kabupaten
-                    }
-                )
+            // Dropdown Kabupaten/Kota (Aktif hanya jika Provinsi valid)
+            EditableDropdownSelectorFL(
+                label = "Kabupaten/Kota",
+                options = if (selectedProvince != null && provinces.any { it.name == selectedProvince }) regencies.map { it.name } else emptyList(),
+                selectedOption = selectedRegency,
+                onOptionSelected = { selectedName ->
+                    val selected = regencies.find { it.name == selectedName }
+                    selectedRegency = selected?.name ?: selectedName?.ifBlank { null }
+                    selectedDistrict = null
+                    selectedVillage = null
+                    selected?.let { reportViewModel.fetchDistricts(it.id) }
+                },
+                enabled = selectedProvince != null && provinces.any { it.name == selectedProvince }
+            )
 
-            // Dropdown Kecamatan
-            EditableDropdownSelector(
-                    label = "Kecamatan",
-                    previousForm = "Kabupaten",
-                    options = districts.map { it.name },
-                    selectedOption = selectedDistrict,
-                    onOptionSelected = { selectedName ->
-                        val selected = districts.find { it.name == selectedName }
-                        selectedDistrict = selected?.name ?: ""
-                        selectedVillage = "" // Reset desa
-                        selected?.let { reportViewModel.fetchVillages(it.id) } // Ambil desa berdasarkan kecamatan
-                    }
-                )
+            // Dropdown Kecamatan (Aktif hanya jika Kabupaten valid)
+            EditableDropdownSelectorFL(
+                label = "Kecamatan",
+                options = if (selectedRegency != null && regencies.any { it.name == selectedRegency }) districts.map { it.name } else emptyList(),
+                selectedOption = selectedDistrict,
+                onOptionSelected = { selectedName ->
+                    selectedDistrict = selectedName?.ifBlank { null }
+                    selectedVillage = null
+                    districts.find { it.name == selectedName }
+                        ?.let { reportViewModel.fetchVillages(it.id) }
+                },
+                enabled = selectedRegency != null && regencies.any { it.name == selectedRegency }
+            )
 
-            // Dropdown Desa
-            EditableDropdownSelector(
-                    label = "Kelurahan/Desa",
-                    previousForm = "Kecamatan",
-                    options = villages.map { it.name },
-                    selectedOption = selectedVillage,
-                    onOptionSelected = { selectedName ->
-                        val selected = villages.find { it.name == selectedName }
-                        selectedVillage = selected?.name ?: "" // Simpan nama desa
-                    }
-                )
+            // Dropdown Kelurahan/Desa (Aktif hanya jika Kecamatan valid)
+            EditableDropdownSelectorFL(
+                label = "Kelurahan/Desa",
+                options = if (selectedDistrict != null && districts.any { it.name == selectedDistrict }) villages.map { it.name } else emptyList(),
+                selectedOption = selectedVillage,
+                onOptionSelected = { selectedName ->
+                    selectedVillage = selectedName?.ifBlank { null }
+                },
+                enabled = selectedDistrict != null && districts.any { it.name == selectedDistrict }
+            )
 
             OutlinedTextField(
                 value = detailAddress,
                 onValueChange = { detailAddress = it },
                 label = { Text("Alamat Tambahan") },
-                placeholder = { Text("Misal:\n" +
-                        "Berjarak sekitar 30 meter di sebelah utara Indosat Center.") },
+                placeholder = {
+                    Text(
+                        "Misal:\n" +
+                                "Berjarak sekitar 30 meter di sebelah utara Indosat Center."
+                    )
+                },
                 trailingIcon = {
                     if (detailAddress.isNotEmpty()) {
-                        IconButton(onClick = { detailAddress = "" }){
+                        IconButton(onClick = { detailAddress = "" }) {
                             Icon(imageVector = Icons.Default.Clear, contentDescription = "clear")
                         }
                     }
@@ -268,7 +350,7 @@ fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStac
                 placeholder = { Text(text = "Jelaskan penyebab masalah tersebut lebih detail, untuk keperluan analisis lebih lanjut") },
                 trailingIcon = {
                     if (description.isNotEmpty()) {
-                        IconButton(onClick = { description = "" }){
+                        IconButton(onClick = { description = "" }) {
                             Icon(imageVector = Icons.Default.Clear, contentDescription = "clear")
                         }
                     }
@@ -287,18 +369,48 @@ fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStac
             Button(
                 onClick = {
                     if (
-                        selectedProvince.isEmpty() ||
-                        selectedRegency.isEmpty() ||
-                        selectedDistrict.isEmpty() ||
-                        selectedVillage.isEmpty() ||
+                        selectedProvince.isNullOrEmpty() ||
+                        selectedRegency.isNullOrEmpty() ||
+                        selectedDistrict.isNullOrEmpty() ||
+                        selectedVillage.isNullOrEmpty() ||
                         detailAddress.isEmpty() ||
                         description.isEmpty()
                     ) {
                         coroutineScope.launch {
-                            snackbarHostState.showSnackbar("Pastikan semua form terisi")
+                            snackbarHostState.showSnackbar("Pastikan semua form terisi dengan benar")
                         }
                     } else {
-                        showConfirmationDialog = true
+                        // Validasi apakah pilihan user sesuai dengan data API
+                        val isValidProvince = provinces.map { it.name }.contains(selectedProvince)
+                        val isValidRegency = regencies.map { it.name }.contains(selectedRegency)
+                        val isValidDistrict = districts.map { it.name }.contains(selectedDistrict)
+                        val isValidVillage = villages.map { it.name }.contains(selectedVillage)
+//                        val isValidRegency = regencies.contains(selectedRegency)
+//                        val isValidDistrict = districts.contains(selectedDistrict)
+//                        val isValidVillage = villages.contains(selectedVillage)
+
+                        when {
+                            !isValidProvince -> coroutineScope.launch {
+                                snackbarHostState.showSnackbar("Nama Provinsi tidak valid!")
+                            }
+
+                            !isValidRegency -> coroutineScope.launch {
+                                snackbarHostState.showSnackbar("Nama Kabupaten tidak valid!")
+                            }
+
+                            !isValidDistrict -> coroutineScope.launch {
+                                snackbarHostState.showSnackbar("Nama Kecamatan tidak valid!")
+                            }
+
+                            !isValidVillage -> coroutineScope.launch {
+                                snackbarHostState.showSnackbar("Nama Desa tidak valid!")
+                            }
+
+                            else -> {
+                                // Jika semua valid, tampilkan dialog konfirmasi
+                                showConfirmationDialog = true
+                            }
+                        }
                     }
                 },
                 modifier = Modifier
@@ -323,17 +435,17 @@ fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStac
 
             if (showConfirmationDialog) {
                 ConfirmationDialog(
-                    onDismiss = { showConfirmationDialog = false},
+                    onDismiss = { showConfirmationDialog = false },
                     onConfirm = {
                         reportViewModel.uploadReport(
                             imageReport = bitmap!!,
                             typeReport = typeReport,
                             userId = "b077733d-e727-4cd5-8a6c-88f98f59d7b1",
                             description = description,
-                            province = selectedProvince,
-                            district = selectedRegency,
-                            subdistrict = selectedDistrict,
-                            village = selectedVillage,
+                            province = selectedProvince!!,
+                            district = selectedRegency!!,
+                            subdistrict = selectedDistrict!!,
+                            village = selectedVillage!!,
                             addressDetail = detailAddress,
                             longitude = longitude,
                             latitude = latitude,
@@ -343,7 +455,9 @@ fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStac
                         coroutineScope.launch {
                             delay(3000)
                             showSuccesDialog = false
-                            navController.navigate(Screen.Home.route)
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.Home.route) { inclusive = true }
+                            }
                         }
                     }
                 )
@@ -358,7 +472,13 @@ fun SubmitReportScreen(navController: NavController, backStackEntry: NavBackStac
 
 @Composable
 fun ReportTypeDropdown(typeReport: String, onTypeSelected: (String) -> Unit) {
-    val reportOptions = listOf("Jalan Rusak", "Sampah Berserakan", "Bangunan Retak", "Bangunan Roboh", "Jembatan Rusak")
+    val reportOptions = listOf(
+        "Jalan Rusak",
+        "Sampah Berserakan",
+        "Bangunan Retak",
+        "Bangunan Roboh",
+        "Jembatan Rusak"
+    )
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(typeReport) }
 

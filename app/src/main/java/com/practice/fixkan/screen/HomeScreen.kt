@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
@@ -40,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.practice.fixkan.R
 import com.practice.fixkan.ui.theme.FixKanTheme
 
@@ -49,6 +51,8 @@ fun HomeScreen(navController: NavHostController) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color(android.graphics.Color.parseColor("#E7FFF2")))
+            .verticalScroll(rememberScrollState())
+            .padding(bottom = 12.dp)
     ) {
         Box(
             modifier = Modifier
@@ -227,7 +231,7 @@ fun HomeScreen(navController: NavHostController) {
                     modifier = Modifier
                         .weight(0.5f)
                         .padding(end = 8.dp)
-                        .clickable { navController.navigate("classification") }
+                        .clickable { }
                 ) {
                     Column(
                         Modifier
@@ -359,7 +363,7 @@ fun HomeScreen(navController: NavHostController) {
                         Modifier
                             .width(240.dp)
                             .height(120.dp)
-                            .background(Color.White)
+                            .background(Color.Gray)
                     ) {
 //                        Image(
 //                            painter = painterResource(id = R.drawable.ic_menu4),
@@ -482,6 +486,6 @@ fun HomeScreen(navController: NavHostController) {
 @Composable
 fun HomePreview() {
     FixKanTheme {
-//        HomeScreen()
+        HomeScreen(navController = rememberNavController())
     }
 }
