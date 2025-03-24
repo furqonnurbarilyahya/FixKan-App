@@ -2,6 +2,7 @@
 agp = "8.6.1"
 coilCompose = "2.0.0"
 converterGson = "2.9.0"
+coreSplashscreenVersion = "1.0.1"
 firebaseBom = "33.9.0"
 kotlin = "1.9.0"
 coreKtx = "1.15.0"
@@ -28,6 +29,7 @@ appcompat = "1.7.0"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreenVersion" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-ml-modeldownloader = { module = "com.google.firebase:firebase-ml-modeldownloader" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
