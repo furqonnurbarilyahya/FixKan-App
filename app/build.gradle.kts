@@ -98,4 +98,6 @@ dependencies {
 
 
     implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.accompanist.systemuicontroller)
 }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -32,6 +33,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -58,47 +61,78 @@ fun HomeScreen(navController: NavHostController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(110.dp)
+                .shadow(
+                    elevation = 12.dp,
+                    shape = RoundedCornerShape(bottomStart = 25.dp, bottomEnd = 25.dp),
+                    ambientColor = Color.Black.copy(alpha = 0.2f),
+                    spotColor = Color.Black.copy(alpha = 0.4f)
+                )
                 .background(
-                    Color(android.graphics.Color.parseColor("#276561")),
-                    shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF276561), // Warna Brand - Deep Green
+                            Color(0xFF3A857F)  // Warna Brand - Lighter Green
+                        )
+                    ),
+                    shape = RoundedCornerShape(bottomStart = 25.dp, bottomEnd = 25.dp)
                 )
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 12.dp),
+                    .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Absolute.SpaceAround
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(
-                    onClick = {}
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Profile",
-                        modifier = Modifier.size(40.dp),
-                        Color.White
-                    )
+                // Profile Section
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(Color.White.copy(alpha = 0.2f), shape = CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Profile",
+                            tint = Color.White,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = "Selamat Datang,",
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Light
+                        )
+                        Text(
+                            text = "User",
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
-                Text(
-                    text = "Selamat Datang, User",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.W500
-                )
-                Spacer(Modifier.width(100.dp))
+
+                // Notification Button
                 IconButton(
-                    onClick = {}
+                    onClick = { /* Aksi Notifikasi */ },
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(Color.White.copy(alpha = 0.2f), shape = CircleShape)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Notifications,
                         contentDescription = "Notifications",
-                        modifier = Modifier.size(30.dp),
-                        Color.White
+                        tint = Color.White,
+                        modifier = Modifier.size(28.dp)
                     )
                 }
             }
         }
+
         Column(
             Modifier
                 .fillMaxWidth()
