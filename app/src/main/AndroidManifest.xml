@@ -15,23 +15,39 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.FixKan"
         tools:targetApi="31">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".AuthActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.FixKan">
+            android:theme="@style/Theme.MyApp.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
+<!--        <activity-->
+<!--            android:name=".MainActivity"-->
+<!--            android:exported="true"-->
+<!--            android:screenOrientation="portrait"-->
+<!--            android:label="@string/app_name"-->
+<!--            android:theme="@style/Theme.FixKan">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
+        <activity android:name=".MainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.FixKan"/>
     </application>
 
 </manifest>

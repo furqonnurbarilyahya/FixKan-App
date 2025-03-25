@@ -64,8 +64,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.appcompat)
-//    implementation(libs.litert.support.api)
-//    implementation(libs.litert)
+    implementation(libs.androidx.datastore.core.android)
+    implementation (libs.androidx.datastore.preferences)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -100,4 +100,6 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.accompanist.systemuicontroller)
+
+    implementation (libs.core.splashscreen)
 }
