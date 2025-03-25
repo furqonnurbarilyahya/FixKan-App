@@ -100,6 +100,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.accompanist.systemuicontroller.v0311alpha)
 
     implementation (libs.core.splashscreen)
 }

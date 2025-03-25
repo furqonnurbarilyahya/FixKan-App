@@ -74,7 +74,7 @@ class ReportViewModel(private val repository: MainRepository) : ViewModel() {
     fun fetchProvinces() {
         viewModelScope.launch {
             try {
-                _provinces.value = ApiConfig.LocationApiService().getProvince()
+                _provinces.value = ApiConfig.locationApiService().getProvince()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -84,7 +84,7 @@ class ReportViewModel(private val repository: MainRepository) : ViewModel() {
     fun fetchRegencies(provinceId: String) {
         viewModelScope.launch {
             try {
-                _regencies.value = ApiConfig.LocationApiService().getRegencies(provinceId)
+                _regencies.value = ApiConfig.locationApiService().getRegencies(provinceId)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -94,7 +94,7 @@ class ReportViewModel(private val repository: MainRepository) : ViewModel() {
     fun fetchDistricts(regencyId: String) {
         viewModelScope.launch {
             try {
-                _districts.value = ApiConfig.LocationApiService().getDistricts(regencyId)
+                _districts.value = ApiConfig.locationApiService().getDistricts(regencyId)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -104,7 +104,7 @@ class ReportViewModel(private val repository: MainRepository) : ViewModel() {
     fun fetchVillages(districtId: String) {
         viewModelScope.launch {
             try {
-                _villages.value = ApiConfig.LocationApiService().getVillages(districtId)
+                _villages.value = ApiConfig.locationApiService().getVillages(districtId)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

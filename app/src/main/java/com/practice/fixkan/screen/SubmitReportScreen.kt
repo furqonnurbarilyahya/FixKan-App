@@ -59,6 +59,7 @@ import com.practice.fixkan.component.EditableDropdownSelectorFL
 import com.practice.fixkan.component.EditableDropdownSelectorProvinceFL
 import com.practice.fixkan.component.SuccessDialog
 import com.practice.fixkan.component.TopBar
+import com.practice.fixkan.data.pref.UserPreference
 import com.practice.fixkan.data.remote.repository.MainRepository
 import com.practice.fixkan.model.ReportData
 import com.practice.fixkan.navigation.Screen
@@ -72,8 +73,11 @@ import kotlinx.serialization.json.Json
 fun SubmitReportScreen(
     navController: NavController,
     backStackEntry: NavBackStackEntry,
-    repository: MainRepository
+    repository: MainRepository,
+    userPreference: UserPreference
 ) {
+
+    val userData by userPreference.getUserData().collectAsState(initial = null)
 
     val context = LocalContext.current
     val jsonData = backStackEntry.arguments?.getString("reportData") ?: ""
@@ -202,61 +206,6 @@ fun SubmitReportScreen(
 
             Spacer(Modifier.height(12.dp))
 
-//            // Dropdown Provinsi
-//            EditableDropdownSelectorProvince(
-//                label = "Provinsi",
-//                options = provinces.map { it.name },
-//                selectedOption = selectedProvince,
-//                onOptionSelected = { selectedName ->
-//                    val selected = provinces.find { it.name == selectedName }
-//                    selectedProvince = selected?.name ?: "" // Simpan nama provinsi
-//                    selectedRegency = "" // Reset kabupaten/kota saat provinsi berubah
-//                    selectedDistrict = "" // Reset kecamatan
-//                    selectedVillage = "" // Reset desa
-//                    selected?.let { reportViewModel.fetchRegencies(it.id) } // Ambil kabupaten berdasarkan provinsi
-//                }
-//            )
-//
-//            // Dropdown Kabupaten/Kota
-//            EditableDropdownSelector(
-//                    label = "Kabupaten/Kota",
-//                    previousForm = "Provinsi",
-//                    options = regencies.map { it.name },
-//                    selectedOption = selectedRegency,
-//                    onOptionSelected = { selectedName ->
-//                        val selected = regencies.find { it.name == selectedName }
-//                        selectedRegency = selected?.name ?: ""
-//                        selectedDistrict = "" // Reset kecamatan
-//                        selectedVillage = "" // Reset desa
-//                        selected?.let { reportViewModel.fetchDistricts(it.id) } // Ambil kecamatan berdasarkan kabupaten
-//                    }
-//                )
-//
-//            // Dropdown Kecamatan
-//            EditableDropdownSelector(
-//                    label = "Kecamatan",
-//                    previousForm = "Kabupaten",
-//                    options = districts.map { it.name },
-//                    selectedOption = selectedDistrict,
-//                    onOptionSelected = { selectedName ->
-//                        val selected = districts.find { it.name == selectedName }
-//                        selectedDistrict = selected?.name ?: ""
-//                        selectedVillage = "" // Reset desa
-//                        selected?.let { reportViewModel.fetchVillages(it.id) } // Ambil desa berdasarkan kecamatan
-//                    }
-//                )
-//
-//            // Dropdown Desa
-//            EditableDropdownSelector(
-//                    label = "Kelurahan/Desa",
-//                    previousForm = "Kecamatan",
-//                    options = villages.map { it.name },
-//                    selectedOption = selectedVillage,
-//                    onOptionSelected = { selectedName ->
-//                        val selected = villages.find { it.name == selectedName }
-//                        selectedVillage = selected?.name ?: "" // Simpan nama desa
-//                    }
-//                )
             // Dropdown Provinsi
             EditableDropdownSelectorProvinceFL(
                 label = "Provinsi",
@@ -385,9 +334,6 @@ fun SubmitReportScreen(
                         val isValidRegency = regencies.map { it.name }.contains(selectedRegency)
                         val isValidDistrict = districts.map { it.name }.contains(selectedDistrict)
                         val isValidVillage = villages.map { it.name }.contains(selectedVillage)
-//                        val isValidRegency = regencies.contains(selectedRegency)
-//                        val isValidDistrict = districts.contains(selectedDistrict)
-//                        val isValidVillage = villages.contains(selectedVillage)
 
                         when {
                             !isValidProvince -> coroutineScope.launch {
@@ -432,35 +378,38 @@ fun SubmitReportScreen(
                 )
             }
 
-
-            if (showConfirmationDialog) {
-                ConfirmationDialog(
-                    onDismiss = { showConfirmationDialog = false },
-                    onConfirm = {
-                        reportViewModel.uploadReport(
-                            imageReport = bitmap!!,
-                            typeReport = typeReport,
-                            userId = "b077733d-e727-4cd5-8a6c-88f98f59d7b1",
-                            description = description,
-                            province = selectedProvince!!,
-                            district = selectedRegency!!,
-                            subdistrict = selectedDistrict!!,
-                            village = selectedVillage!!,
-                            addressDetail = detailAddress,
-                            longitude = longitude,
-                            latitude = latitude,
-                        )
-                        showConfirmationDialog = false
-                        showSuccesDialog = true
-                        coroutineScope.launch {
-                            delay(3000)
-                            showSuccesDialog = false
-                            navController.navigate(Screen.Home.route) {
-                                popUpTo(Screen.Home.route) { inclusive = true }
+            userData?.user.let { user ->
+                if (showConfirmationDialog) {
+                    ConfirmationDialog(
+                        onDismiss = { showConfirmationDialog = false },
+                        onConfirm = {
+                            user?.let {
+                                reportViewModel.uploadReport(
+                                    imageReport = bitmap!!,
+                                    typeReport = typeReport,
+                                    userId = it.id,
+                                    description = description,
+                                    province = selectedProvince!!,
+                                    district = selectedRegency!!,
+                                    subdistrict = selectedDistrict!!,
+                                    village = selectedVillage!!,
+                                    addressDetail = detailAddress,
+                                    longitude = longitude,
+                                    latitude = latitude,
+                                )
+                            }
+                            showConfirmationDialog = false
+                            showSuccesDialog = true
+                            coroutineScope.launch {
+                                delay(3000)
+                                showSuccesDialog = false
+                                navController.navigate(Screen.Home.route) {
+                                    popUpTo(Screen.Home.route) { inclusive = true }
+                                }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
 
             if (showSuccesDialog) {

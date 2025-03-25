@@ -30,6 +30,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,12 +46,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.practice.fixkan.R
+import com.practice.fixkan.data.pref.UserPreference
 import com.practice.fixkan.ui.theme.FixKanTheme
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(navController: NavHostController, userPreference: UserPreference) {
+
+    val userData by userPreference.getUserData().collectAsState(initial = null)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -107,12 +112,14 @@ fun HomeScreen(navController: NavHostController) {
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Light
                         )
-                        Text(
-                            text = "User",
-                            color = Color.White,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        userData?.user?.let {
+                            Text(
+                                text = it.name,
+                                color = Color.White,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
 
@@ -520,6 +527,6 @@ fun HomeScreen(navController: NavHostController) {
 @Composable
 fun HomePreview() {
     FixKanTheme {
-        HomeScreen(navController = rememberNavController())
+//        HomeScreen(navController = rememberNavController())
     }
 }

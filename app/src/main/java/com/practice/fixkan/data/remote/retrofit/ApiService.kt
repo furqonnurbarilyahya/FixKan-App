@@ -5,11 +5,14 @@ import com.practice.fixkan.model.response.ListReportResponse
 import com.practice.fixkan.model.response.DistrictResponseItem
 import com.practice.fixkan.model.response.LoginResponse
 import com.practice.fixkan.model.response.ProvinceResponseItem
+import com.practice.fixkan.model.response.RefreshTokenRequest
+import com.practice.fixkan.model.response.RefreshTokenResponse
 import com.practice.fixkan.model.response.RegenciesResponseItem
 import com.practice.fixkan.model.response.RegisterResponse
 import com.practice.fixkan.model.response.VillageResponseItem
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -18,6 +21,7 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.Response
 
 interface ApiService {
     @GET("reports")
@@ -78,4 +82,10 @@ interface ApiService {
         @Field("email") email: String,
         @Field("password") password: String
     ) : LoginResponse
+
+    @FormUrlEncoded
+    @POST("auth/refresh")
+    suspend fun refreshToken (
+        @Body request: RefreshTokenRequest
+    ) : Response<RefreshTokenResponse>
 }

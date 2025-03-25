@@ -1,7 +1,6 @@
 package com.practice.fixkan
 
 import android.Manifest
-import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -25,9 +24,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -37,6 +33,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.practice.fixkan.data.pref.UserPreference
+import com.practice.fixkan.data.pref.dataStore
 import com.practice.fixkan.data.remote.repository.AuthRepository
 import com.practice.fixkan.data.remote.repository.MainRepository
 import com.practice.fixkan.data.remote.retrofit.ApiConfig
@@ -44,14 +41,12 @@ import com.practice.fixkan.navigation.NavigationItem
 import com.practice.fixkan.navigation.Screen
 import com.practice.fixkan.screen.ClassificationScreen
 import com.practice.fixkan.screen.HomeScreen
-import com.practice.fixkan.screen.listReport.ListReportScreen
-import com.practice.fixkan.screen.listReport.ListReportViewModel
 import com.practice.fixkan.screen.ResultClassificationScreen
 import com.practice.fixkan.screen.SubmitReportScreen
+import com.practice.fixkan.screen.listReport.ListReportScreen
+import com.practice.fixkan.screen.listReport.ListReportViewModel
 import com.practice.fixkan.screen.profile.ProfileScreen
 import com.practice.fixkan.ui.theme.FixKanTheme
-
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_prefs")
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,7 +75,7 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
 
     val showBottomNav = currentRoute in listOf("home", "report", "profile")
 
-    val apiService = ApiConfig.ReportApiService()
+    val apiService = ApiConfig.reportApiService(context)
     val reportRepository = MainRepository(apiService)
     val listReportViewModel: ListReportViewModel = viewModel(factory = MainViewModelFactory(reportRepository))
 
@@ -110,7 +105,7 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
             modifier = Modifier.padding(innerpadding)
         ) {
             composable(Screen.Home.route) {
-                HomeScreen(navController = navController)
+                HomeScreen(navController = navController, userPreference)
             }
             composable(Screen.Report.route) {
                 ListReportScreen(context, listReportViewModel = listReportViewModel, repository = reportRepository)
@@ -127,7 +122,7 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
                 ResultClassificationScreen(Uri.decode(imageUri), Uri.decode(result), navController = navController, repository = reportRepository)
             }
             composable(Screen.CreateReport.route) {
-                SubmitReportScreen(navController = navController, backStackEntry = it, repository = reportRepository )
+                SubmitReportScreen(navController = navController, backStackEntry = it, repository = reportRepository, userPreference = userPreference)
             }
         }
     }
