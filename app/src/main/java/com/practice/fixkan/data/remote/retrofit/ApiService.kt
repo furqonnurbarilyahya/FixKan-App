@@ -3,11 +3,15 @@ package com.practice.fixkan.data.remote.retrofit
 import com.practice.fixkan.model.response.CreateReportResponse
 import com.practice.fixkan.model.response.ListReportResponse
 import com.practice.fixkan.model.response.DistrictResponseItem
+import com.practice.fixkan.model.response.LoginResponse
 import com.practice.fixkan.model.response.ProvinceResponseItem
 import com.practice.fixkan.model.response.RegenciesResponseItem
+import com.practice.fixkan.model.response.RegisterResponse
 import com.practice.fixkan.model.response.VillageResponseItem
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -55,4 +59,23 @@ interface ApiService {
         @Part("longitude") longitude: RequestBody,
         @Part("latitude") latitude: RequestBody,
     ): CreateReportResponse
+
+    @FormUrlEncoded
+    @POST("auth/register")
+    suspend fun register (
+        @Field("name") name: String,
+        @Field("email") email: String,
+        @Field("password") password: String,
+        @Field("province") province: String,
+        @Field("district") district: String,
+        @Field("subdistrict") subdistrict: String,
+        @Field("village") village: String
+    ) : RegisterResponse
+
+    @FormUrlEncoded
+    @POST("auth/login")
+    suspend fun login (
+        @Field("email") email: String,
+        @Field("password") password: String
+    ) : LoginResponse
 }

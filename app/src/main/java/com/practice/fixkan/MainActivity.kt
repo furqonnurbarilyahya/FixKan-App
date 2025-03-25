@@ -1,6 +1,7 @@
 package com.practice.fixkan
 
 import android.Manifest
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -23,6 +24,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -30,6 +34,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.practice.fixkan.data.pref.UserPreference
+import com.practice.fixkan.data.remote.repository.AuthRepository
 import com.practice.fixkan.data.remote.repository.MainRepository
 import com.practice.fixkan.data.remote.retrofit.ApiConfig
 import com.practice.fixkan.navigation.NavigationItem
@@ -40,7 +46,10 @@ import com.practice.fixkan.screen.listReport.ListReportScreen
 import com.practice.fixkan.screen.listReport.ListReportViewModel
 import com.practice.fixkan.screen.ResultClassificationScreen
 import com.practice.fixkan.screen.SubmitReportScreen
+import com.practice.fixkan.screen.profile.ProfileScreen
 import com.practice.fixkan.ui.theme.FixKanTheme
+
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_prefs")
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,6 +82,9 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
     val reportRepository = MainRepository(apiService)
     val listReportViewModel: ListReportViewModel = viewModel(factory = MainViewModelFactory(reportRepository))
 
+    val userPreference = UserPreference.getInstance(context.dataStore) // Gunakan 'this' sebagai context
+    val authRepository = AuthRepository(apiService, userPreference)
+    val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authRepository, userPreference))
 
     Scaffold (
         bottomBar = {
@@ -95,6 +107,9 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
             }
             composable(Screen.Classification.route) {
                 ClassificationScreen(navController = navController)
+            }
+            composable(Screen.Profile.route) {
+                ProfileScreen(authViewModel, userPreference)
             }
 //            composable(Screen.ResultClassification.route) {
 //                ResultClassificationScreen()
