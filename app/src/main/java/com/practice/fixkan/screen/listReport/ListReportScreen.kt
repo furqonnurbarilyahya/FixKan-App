@@ -280,6 +280,23 @@ fun ListReportScreen(
                     lineHeight = 18.sp,
                     modifier = Modifier.padding(horizontal = 24.dp)
                 )
+
+                Button(
+                    onClick = { listReportViewModel.getListReport() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(
+                            0xFF007BFF
+                        )
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Refresh",
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "Segarkan Laporan")
+                }
             }
 
         }
@@ -391,27 +408,27 @@ fun ListReportItem(
                             Spacer(modifier = Modifier.height(6.dp))
 
                             // Baris 1: Latitude & Longitude
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Outlined.LocationOn,
-                                    contentDescription = "Coordinates",
-                                    tint = Color(0xFF388E3C),
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Column {
-                                    Text(
-                                        text = "Lat: ${it.latitude}",
-                                        fontSize = 12.sp,
-                                        color = Color.Gray
-                                    )
-                                    Text(
-                                        text = "Long: ${it.longitude}",
-                                        fontSize = 12.sp,
-                                        color = Color.Gray
-                                    )
-                                }
-                            }
+//                            Row(verticalAlignment = Alignment.CenterVertically) {
+//                                Icon(
+//                                    imageVector = Icons.Outlined.LocationOn,
+//                                    contentDescription = "Coordinates",
+//                                    tint = Color(0xFF388E3C),
+//                                    modifier = Modifier.size(16.dp)
+//                                )
+//                                Spacer(modifier = Modifier.width(6.dp))
+//                                Column {
+//                                    Text(
+//                                        text = "Lat: ${it.latitude}",
+//                                        fontSize = 12.sp,
+//                                        color = Color.Gray
+//                                    )
+//                                    Text(
+//                                        text = "Long: ${it.longitude}",
+//                                        fontSize = 12.sp,
+//                                        color = Color.Gray
+//                                    )
+//                                }
+//                            }
 
                             Spacer(modifier = Modifier.height(4.dp))
 
@@ -423,14 +440,41 @@ fun ListReportItem(
                                     tint = Color(0xFF388E3C),
                                     modifier = Modifier.size(16.dp)
                                 )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    text = "${it.province}, ${it.district}, ${it.subdistrict}, ${it.village}",
-                                    fontSize = 14.sp,
-                                    color = Color.Gray,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
+                                Spacer(Modifier.width(6.dp))
+                                Column {
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = "Provinsi: ${it.province}",
+                                        fontSize = 14.sp,
+                                        color = Color.Gray,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = "Kab/Kota: ${it.district.replace("KABUPATEN ", "KAB. ")}",
+                                        fontSize = 14.sp,
+                                        color = Color.Gray,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = "Kecamatan: ${it.subdistrict}",
+                                        fontSize = 14.sp,
+                                        color = Color.Gray,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = "Desa/Kel: ${it.village}",
+                                        fontSize = 14.sp,
+                                        color = Color.Gray,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
                             }
 
                             Spacer(modifier = Modifier.height(6.dp))

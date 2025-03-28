@@ -1,5 +1,6 @@
 package com.practice.fixkan.screen.listReport
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practice.fixkan.data.UiState
@@ -41,6 +42,8 @@ class ListReportViewModel(private val repository: MainRepository) : ViewModel() 
                 "orderby" to orderBy
             )
             val result = repository.getListReport(typeReport, province, district, subdistrict, village, sortBy, orderBy)
+            Log.d("ListReportViewModel", "Response Data: ${result.getOrNull()}")
+
 
             _listReportState.value = result.fold(
                 onSuccess = { data ->
