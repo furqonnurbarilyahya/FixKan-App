@@ -82,7 +82,7 @@ class ImageClassificationHelper(private val context: Context) {
         val maxIndex = outputArray.indices.maxByOrNull { outputArray[it] } ?: return "Prediksi: Unknown"
 
         // Daftar label kelas
-        val classLabels = arrayOf("Bangunan Normal", "Bangunan Runtuh", "Bangunan Retak", "Jalan Normal", "Jalan Rusak", "Lingkungan Bersih", "Sampah Berserakan")
+        val classLabels = arrayOf("Bangunan Normal", "Bangunan Roboh", "Bangunan Rusak", "Jalan Normal", "Jalan Rusak", "Lingkungan Bersih", "Sampah Berserakan")
 
         return if (maxIndex in classLabels.indices) {
             classLabels[maxIndex]

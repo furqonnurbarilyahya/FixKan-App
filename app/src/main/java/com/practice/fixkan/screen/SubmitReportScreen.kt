@@ -415,6 +415,7 @@ fun SubmitReportScreen(
             if (showSuccesDialog) {
                 SuccessDialog()
             }
+            Log.d("SubmitReportScreen", "Received Photo URI: $")
         }
     }
 }
@@ -424,7 +425,7 @@ fun ReportTypeDropdown(typeReport: String, onTypeSelected: (String) -> Unit) {
     val reportOptions = listOf(
         "Jalan Rusak",
         "Sampah Berserakan",
-        "Bangunan Retak",
+        "Bangunan Rusak",
         "Bangunan Roboh",
         "Jembatan Rusak"
     )
