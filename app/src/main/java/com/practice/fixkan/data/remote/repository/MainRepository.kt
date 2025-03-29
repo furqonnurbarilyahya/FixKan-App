@@ -7,12 +7,17 @@ import com.practice.fixkan.data.UiState
 import com.practice.fixkan.data.remote.retrofit.ApiService
 import com.practice.fixkan.model.response.CreateReportResponse
 import com.practice.fixkan.model.response.DataItem
+import com.practice.fixkan.model.response.DataStat
+import com.practice.fixkan.model.response.StatisticResponse
 import com.practice.fixkan.utils.bitmaptoMultipart
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.HttpException
 import retrofit2.http.Query
 import java.io.File
 import kotlin.concurrent.Volatile
@@ -81,6 +86,40 @@ class MainRepository(private val apiService: ApiService) {
             Result.success(response.data)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+//    suspend fun fetchStatisticData(
+//        province: String,
+//        district: String,
+//        subdistrict: String,
+//        village: String
+//    ): Result<StatisticResponse> {
+//        return try {
+//            val response = apiService.getStatisticData(province, district, subdistrict, village)
+//            Result.success(response)
+//        } catch (e: Exception) {
+//            Result.failure(e)
+//        }
+//    }
+
+    suspend fun fetchStatistics(
+        province: String?,
+        district: String?,
+        subdistrict: String?,
+        village: String?
+    ): Result<StatisticResponse> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = apiService.getStatisticData(province, district, subdistrict, village)
+                Result.success(response)
+            } catch (e: HttpException) {
+                Log.e("StatisticRepository", "HTTP error: ${e.code()} - ${e.message()}")
+                Result.failure(e)
+            } catch (e: Exception) {
+                Log.e("StatisticRepository", "Unknown error: ${e.message}")
+                Result.failure(e)
+            }
         }
     }
 

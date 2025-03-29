@@ -9,9 +9,11 @@ import com.practice.fixkan.model.response.RefreshTokenRequest
 import com.practice.fixkan.model.response.RefreshTokenResponse
 import com.practice.fixkan.model.response.RegenciesResponseItem
 import com.practice.fixkan.model.response.RegisterResponse
+import com.practice.fixkan.model.response.StatisticResponse
 import com.practice.fixkan.model.response.VillageResponseItem
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -34,7 +36,7 @@ interface ApiService {
         @Query("sortBy") sortBy: String? = "createdAt",
         @Query("order") orderBy: String? = "DESC",
 
-    ): ListReportResponse
+        ): ListReportResponse
 
     @GET("provinces.json")
     suspend fun getProvince(): List<ProvinceResponseItem>
@@ -52,7 +54,7 @@ interface ApiService {
     @POST("reports")
     suspend fun createReport(
         @Part image: MultipartBody.Part,
-        @Part ("userId") userId: RequestBody,
+        @Part("userId") userId: RequestBody,
         @Part("type_report") typeReport: RequestBody,
         @Part("description") description: RequestBody,
         @Part("province") province: RequestBody,
@@ -66,7 +68,7 @@ interface ApiService {
 
     @FormUrlEncoded
     @POST("auth/register")
-    suspend fun register (
+    suspend fun register(
         @Field("name") name: String,
         @Field("email") email: String,
         @Field("password") password: String,
@@ -74,18 +76,43 @@ interface ApiService {
         @Field("district") district: String,
         @Field("subdistrict") subdistrict: String,
         @Field("village") village: String
-    ) : RegisterResponse
+    ): RegisterResponse
 
     @FormUrlEncoded
     @POST("auth/login")
-    suspend fun login (
+    suspend fun login(
         @Field("email") email: String,
         @Field("password") password: String
-    ) : LoginResponse
+    ): LoginResponse
+
+//    @FormUrlEncoded
+//    @POST("auth/refresh")
+//    suspend fun refreshToken (
+//        @Body request: RefreshTokenRequest
+//    ) : Response<RefreshTokenResponse>
+
+//    @FormUrlEncoded
+//    @POST("auth/refresh")
+//    fun refreshToken(@Field("refresh_token") refreshToken: String): Call<RefreshTokenResponse>
 
     @FormUrlEncoded
     @POST("auth/refresh")
-    suspend fun refreshToken (
-        @Body request: RefreshTokenRequest
-    ) : Response<RefreshTokenResponse>
+    fun refreshToken(@Field("refreshToken") refreshToken: String): Call<RefreshTokenResponse>
+
+//    @GET("statistics/reports")
+//    suspend fun getStatisticData(
+//        @Query("province") province: String,
+//        @Query("district") district: String,
+//        @Query("subdistrict") subdistrict: String,
+//        @Query("village") village: String,
+//
+//        ): StatisticResponse
+
+    @GET("statistics/reports")
+    suspend fun getStatisticData(
+        @Query("province") province: String? = null,
+        @Query("district") district: String? = null,
+        @Query("subdistrict") subdistrict: String? = null,
+        @Query("village") village: String? = null
+    ): StatisticResponse
 }

@@ -46,6 +46,8 @@ import com.practice.fixkan.screen.SubmitReportScreen
 import com.practice.fixkan.screen.listReport.ListReportScreen
 import com.practice.fixkan.screen.listReport.ListReportViewModel
 import com.practice.fixkan.screen.profile.ProfileScreen
+import com.practice.fixkan.screen.statistics.StatisticScreen
+import com.practice.fixkan.screen.statistics.StatisticViewModel
 import com.practice.fixkan.ui.theme.FixKanTheme
 
 class MainActivity : ComponentActivity() {
@@ -78,6 +80,7 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
     val apiService = ApiConfig.reportApiService(context)
     val reportRepository = MainRepository(apiService)
     val listReportViewModel: ListReportViewModel = viewModel(factory = MainViewModelFactory(reportRepository))
+    val statisticViewModel: StatisticViewModel = viewModel(factory = MainViewModelFactory(reportRepository))
 
     val systemUiController = rememberSystemUiController()
 
@@ -108,10 +111,13 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
                 HomeScreen(navController = navController, userPreference)
             }
             composable(Screen.Report.route) {
-                ListReportScreen(context, listReportViewModel = listReportViewModel, repository = reportRepository)
+                ListReportScreen(context, listReportViewModel, reportRepository)
             }
             composable(Screen.Classification.route) {
-                ClassificationScreen(navController = navController)
+                ClassificationScreen(navController)
+            }
+            composable(Screen.Statistics.route) {
+                StatisticScreen(context, statisticViewModel, navController, reportRepository)
             }
             composable(Screen.Profile.route) {
                 ProfileScreen(authViewModel, userPreference)

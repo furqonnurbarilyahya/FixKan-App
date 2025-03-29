@@ -7,4 +7,5 @@ sealed class Screen (val route: String) {
     data object Classification: Screen("classification")
     data object ResultClassification: Screen("result_classification/{imageUri}/{result}")
     data object CreateReport: Screen("create_report/{reportData}")
+    data object Statistics: Screen("statistics")
 }

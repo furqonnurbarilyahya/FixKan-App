@@ -103,4 +103,6 @@ dependencies {
     implementation(libs.accompanist.systemuicontroller.v0311alpha)
 
     implementation (libs.core.splashscreen)
+
+    implementation (libs.ycharts)
 }
