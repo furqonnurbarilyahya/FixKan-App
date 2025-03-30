@@ -1,11 +1,13 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.google.gms.google-services")
+    id("kotlinx-serialization")
 }
 
 android {
     namespace = "com.practice.fixkan"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.practice.fixkan"
@@ -59,6 +61,11 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.datastore.core.android)
+    implementation (libs.androidx.datastore.preferences)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -66,4 +73,36 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    // Import the BoM for the Firebase platform
+    implementation(platform(libs.firebase.bom))
+
+    // Add the dependency for the Firebase ML model downloader library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation(libs.firebase.ml.modeldownloader)
+
+    // Also add the dependency for the TensorFlow Lite library and specify its version
+//    implementation(libs.tensorflow.lite)
+
+    implementation (libs.coil.compose)
+    implementation (libs.tensorflow.lite)
+    implementation (libs.tensorflow.lite.task.vision)
+    implementation (libs.tensorflow.lite.support)
+
+    //Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
+
+    // Google Play Services - Location
+    implementation (libs.play.services.location)
+
+
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.accompanist.systemuicontroller.v0311alpha)
+
+    implementation (libs.core.splashscreen)
+
+    implementation (libs.ycharts)
 }

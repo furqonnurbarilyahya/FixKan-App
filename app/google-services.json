@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "728754022903",
+    "project_id": "fixkan-app",
+    "storage_bucket": "fixkan-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:728754022903:android:87b9eec6ae0a2f726526f2",
+        "android_client_info": {
+          "package_name": "com.practice.fixkan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwB8DKL-AC5NA1rWRXnJkHFXZ5Or0PnBA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
