@@ -1,9 +1,12 @@
 package com.practice.fixkan.data.remote.retrofit
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import android.widget.Toast
 import com.practice.fixkan.data.pref.UserPreference
 import com.practice.fixkan.data.pref.dataStore
-import com.practice.fixkan.model.response.RefreshTokenRequest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -39,12 +42,12 @@ object ApiConfig {
         lateinit var apiService: ApiService
 
         val client: OkHttpClient = OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(userPreference) { apiService }) // Lazy ApiService
+            .addInterceptor(AuthInterceptor(context,userPreference) { apiService })
             .build()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://sec-prediction-app-backend.vercel.app/")
-//            .baseUrl("http://18.141.58.71:3000")
+//            .baseUrl("https://sec-prediction-app-backend.vercel.app/")
+            .baseUrl("https://fixkan-api.zainal-saputra.click/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
@@ -73,31 +76,61 @@ object ApiConfig {
     }
 }
 
+
 class AuthInterceptor(
+    private val context: Context,
     private val userPreference: UserPreference,
-    private val apiServiceProvider: () -> ApiService // Lazy initialization
+    private val apiServiceProvider: () -> ApiService
 ) : Interceptor {
 
+    @Volatile
+    private var isRefreshing = false // Flag untuk mencegah infinite loop
+
     override fun intercept(chain: Interceptor.Chain): Response {
-        val accessToken = runBlocking {
+        var accessToken = runBlocking {
             userPreference.getUserData().firstOrNull()?.accessToken.orEmpty()
         }
+        Log.d("AuthInterceptor", "Access Token (Before Request): $accessToken")
 
         val request = chain.request().newBuilder()
             .addHeader("Authorization", "Bearer $accessToken")
             .build()
 
-        var response = chain.proceed(request)
+        val response = chain.proceed(request)
+        Log.d("AuthInterceptor", "Response Code: ${response.code}")
 
-        if (response.code == 401) { // Jika token expired
+        if (response.code == 401 || response.code == 403) { // Jika token expired atau unauthorized
+            response.close()
+
+            if (isRefreshing) {
+                Log.e("AuthInterceptor", "Already refreshing token. Preventing infinite loop.")
+                return response // Cegah multiple refresh token dalam satu request
+            }
+
+            isRefreshing = true // Set flag saat mulai refresh token
+
             val refreshToken = runBlocking {
                 userPreference.getUserData().firstOrNull()?.refreshToken.orEmpty()
             }
+            Log.d("AuthInterceptor", "Refresh Token: $refreshToken")
 
             if (refreshToken.isNotEmpty()) {
                 val newToken = runBlocking {
-                    apiServiceProvider().refreshToken(RefreshTokenRequest(refreshToken))
-                        .body()?.accessToken
+                    try {
+                        val refreshResponse = apiServiceProvider()
+                            .refreshToken(refreshToken)
+                            .execute()
+
+                        if (refreshResponse.isSuccessful) {
+                            refreshResponse.body()?.accessToken
+                        } else {
+                            Log.e("AuthInterceptor", "Refresh Token Failed: ${refreshResponse.errorBody()?.string()}")
+                            null
+                        }
+                    } catch (e: Exception) {
+                        Log.e("AuthInterceptor", "Error refreshing token", e)
+                        null
+                    }
                 }
 
                 if (!newToken.isNullOrEmpty()) {
@@ -108,14 +141,32 @@ class AuthInterceptor(
                         }
                     }
 
-                    val newRequest = request.newBuilder()
-                        .header("Authorization", "Bearer $newToken")
+                    accessToken = runBlocking {
+                        userPreference.getUserData().firstOrNull()?.accessToken.orEmpty()
+                    }
+                    Log.d("AuthInterceptor", "Access Token (After Refresh): $accessToken")
+
+                    val newRequest = chain.request().newBuilder()
+                        .header("Authorization", "Bearer $accessToken")
                         .build()
-                    response.close()
-                    response = chain.proceed(newRequest)
+
+                    isRefreshing = false // Reset flag setelah refresh selesai
+                    return chain.proceed(newRequest)
+                } else {
+                    Log.e("AuthInterceptor", "Refresh token failed, forcing user to logout.")
+//                    runBlocking { userPreference.logout() } // Logout user
+                    // Tampilkan Toast di UI Thread
+                    Handler(Looper.getMainLooper()).post {
+                        Toast.makeText(context, "Sesi habis. Mohon untuk login ulang.", Toast.LENGTH_LONG).show()
+                    }
                 }
             }
         }
+
+        isRefreshing = false // Reset flag setelah request selesai
         return response
     }
 }
+
+
+

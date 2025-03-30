@@ -9,4 +9,8 @@ sealed class Screen (val route: String) {
     data object ResultClassification: Screen("result_classification/{imageUri}/{result}")
     data object CreateReport: Screen("create_report/{reportData}")
     data object Statistics: Screen("statistics")
+    data object TipsA: Screen("tips_a")
+    data object TipsB: Screen("tips_b")
+    data object TipsC: Screen("tips_c")
+    data object HistoryReport: Screen("history_report")
 }

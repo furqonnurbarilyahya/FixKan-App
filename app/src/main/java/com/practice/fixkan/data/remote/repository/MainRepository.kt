@@ -1,25 +1,18 @@
 package com.practice.fixkan.data.remote.repository
 
 import android.graphics.Bitmap
-import android.provider.ContactsContract.RawContacts.Data
 import android.util.Log
-import com.practice.fixkan.data.UiState
 import com.practice.fixkan.data.remote.retrofit.ApiService
 import com.practice.fixkan.model.response.CreateReportResponse
 import com.practice.fixkan.model.response.DataItem
-import com.practice.fixkan.model.response.DataStat
+import com.practice.fixkan.model.response.HistoryReportResponse
 import com.practice.fixkan.model.response.StatisticResponse
 import com.practice.fixkan.utils.bitmaptoMultipart
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
-import retrofit2.http.Query
-import java.io.File
 import kotlin.concurrent.Volatile
 
 class MainRepository(private val apiService: ApiService) {
@@ -89,20 +82,6 @@ class MainRepository(private val apiService: ApiService) {
         }
     }
 
-//    suspend fun fetchStatisticData(
-//        province: String,
-//        district: String,
-//        subdistrict: String,
-//        village: String
-//    ): Result<StatisticResponse> {
-//        return try {
-//            val response = apiService.getStatisticData(province, district, subdistrict, village)
-//            Result.success(response)
-//        } catch (e: Exception) {
-//            Result.failure(e)
-//        }
-//    }
-
     suspend fun fetchStatistics(
         province: String?,
         district: String?,
@@ -121,6 +100,13 @@ class MainRepository(private val apiService: ApiService) {
                 Result.failure(e)
             }
         }
+    }
+
+    suspend fun getHistoryReports(userId: String): HistoryReportResponse {
+        Log.d("HistoryReportRepository", "Fetching reports for user: $userId")
+        val response = apiService.getHistoryReports(userId)
+        Log.d("HistoryReportRepository", "Received response: $response")
+        return response
     }
 
     companion object {

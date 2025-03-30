@@ -41,16 +41,21 @@ import com.practice.fixkan.data.remote.repository.MainRepository
 import com.practice.fixkan.data.remote.retrofit.ApiConfig
 import com.practice.fixkan.navigation.NavigationItem
 import com.practice.fixkan.navigation.Screen
-import com.practice.fixkan.screen.ClassificationScreen
+import com.practice.fixkan.screen.createReport.ClassificationScreen
 import com.practice.fixkan.screen.DetailReportScreen
 import com.practice.fixkan.screen.HomeScreen
-import com.practice.fixkan.screen.ResultClassificationScreen
-import com.practice.fixkan.screen.SubmitReportScreen
+import com.practice.fixkan.screen.createReport.ResultClassificationScreen
+import com.practice.fixkan.screen.createReport.SubmitReportScreen
+import com.practice.fixkan.screen.history.HistoryReportScreen
+import com.practice.fixkan.screen.history.HistoryReportViewModel
 import com.practice.fixkan.screen.listReport.ListReportScreen
 import com.practice.fixkan.screen.listReport.ListReportViewModel
 import com.practice.fixkan.screen.profile.ProfileScreen
 import com.practice.fixkan.screen.statistics.StatisticScreen
 import com.practice.fixkan.screen.statistics.StatisticViewModel
+import com.practice.fixkan.screen.tips.TipsAScreen
+import com.practice.fixkan.screen.tips.TipsBScreen
+import com.practice.fixkan.screen.tips.TipsCScreen
 import com.practice.fixkan.ui.theme.FixKanTheme
 
 class MainActivity : ComponentActivity() {
@@ -84,6 +89,7 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
     val reportRepository = MainRepository(apiService)
     val listReportViewModel: ListReportViewModel = viewModel(factory = MainViewModelFactory(reportRepository))
     val statisticViewModel: StatisticViewModel = viewModel(factory = MainViewModelFactory(reportRepository))
+    val historyReportViewModel: HistoryReportViewModel = viewModel(factory = MainViewModelFactory(reportRepository))
 
 
     val systemUiController = rememberSystemUiController()
@@ -141,6 +147,18 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
             }
             composable(Screen.CreateReport.route) {
                 SubmitReportScreen(navController = navController, backStackEntry = it, repository = reportRepository, userPreference = userPreference)
+            }
+            composable(Screen.TipsA.route) {
+                TipsAScreen(navController)
+            }
+            composable(Screen.TipsB.route) {
+                TipsBScreen(navController)
+            }
+            composable(Screen.TipsC.route) {
+                TipsCScreen(navController)
+            }
+            composable(Screen.HistoryReport.route) {
+                HistoryReportScreen(context, historyReportViewModel, userPreference, navController)
             }
         }
     }

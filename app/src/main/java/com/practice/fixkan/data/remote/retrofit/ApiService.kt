@@ -1,11 +1,11 @@
 package com.practice.fixkan.data.remote.retrofit
 
 import com.practice.fixkan.model.response.CreateReportResponse
-import com.practice.fixkan.model.response.ListReportResponse
 import com.practice.fixkan.model.response.DistrictResponseItem
+import com.practice.fixkan.model.response.HistoryReportResponse
+import com.practice.fixkan.model.response.ListReportResponse
 import com.practice.fixkan.model.response.LoginResponse
 import com.practice.fixkan.model.response.ProvinceResponseItem
-import com.practice.fixkan.model.response.RefreshTokenRequest
 import com.practice.fixkan.model.response.RefreshTokenResponse
 import com.practice.fixkan.model.response.RegenciesResponseItem
 import com.practice.fixkan.model.response.RegisterResponse
@@ -14,7 +14,6 @@ import com.practice.fixkan.model.response.VillageResponseItem
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
-import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -23,7 +22,6 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
-import retrofit2.Response
 
 interface ApiService {
     @GET("reports")
@@ -85,28 +83,10 @@ interface ApiService {
         @Field("password") password: String
     ): LoginResponse
 
-//    @FormUrlEncoded
-//    @POST("auth/refresh")
-//    suspend fun refreshToken (
-//        @Body request: RefreshTokenRequest
-//    ) : Response<RefreshTokenResponse>
-
-//    @FormUrlEncoded
-//    @POST("auth/refresh")
-//    fun refreshToken(@Field("refresh_token") refreshToken: String): Call<RefreshTokenResponse>
-
     @FormUrlEncoded
     @POST("auth/refresh")
     fun refreshToken(@Field("refreshToken") refreshToken: String): Call<RefreshTokenResponse>
 
-//    @GET("statistics/reports")
-//    suspend fun getStatisticData(
-//        @Query("province") province: String,
-//        @Query("district") district: String,
-//        @Query("subdistrict") subdistrict: String,
-//        @Query("village") village: String,
-//
-//        ): StatisticResponse
 
     @GET("statistics/reports")
     suspend fun getStatisticData(
@@ -115,4 +95,9 @@ interface ApiService {
         @Query("subdistrict") subdistrict: String? = null,
         @Query("village") village: String? = null
     ): StatisticResponse
+
+    @GET("reports/user/{userId}")
+    suspend fun getHistoryReports(
+        @Path("userId") userId: String
+    ): HistoryReportResponse
 }
