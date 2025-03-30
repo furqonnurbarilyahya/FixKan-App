@@ -216,7 +216,7 @@ fun StatisticScreen(
 
                     Button(
                         onClick = {
-                            val isValidProvince = provinces.map { it.name }.contains(selectedProvince)
+                            val isValidProvince = selectedProvince.isNullOrBlank() || provinces.map { it.name }.contains(selectedProvince)
                             val isValidRegency = selectedRegency.isNullOrBlank() || regencies.map { it.name }.contains(selectedRegency)
                             val isValidDistrict = selectedDistrict.isNullOrBlank() || districts.map { it.name }.contains(selectedDistrict)
                             val isValidVillage = selectedVillage.isNullOrBlank() || villages.map { it.name }.contains(selectedVillage)

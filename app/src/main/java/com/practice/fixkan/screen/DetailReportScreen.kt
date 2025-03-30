@@ -106,6 +106,8 @@ fun DetailReportScreen(
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
+                    DetailRow(label = "Latitude", value = reportItem.latitude)
+                    DetailRow(label = "Langitude", value = reportItem.longitude)
                     DetailRow(label = "Provinsi", value = reportItem.province)
                     DetailRow(label = "Kabupaten", value = reportItem.district)
                     DetailRow(label = "Kecamatan", value = reportItem.subdistrict)
@@ -134,15 +136,6 @@ fun DetailReportScreen(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-
-//            // Tanggal Dibuat & Diperbarui
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.SpaceBetween
-//            ) {
-//                DateInfo(label = "Dibuat", date = reportItem.createdAt)
-//                DateInfo(label = "Diperbarui", date = reportItem.updatedAt)
-//            }
         }
     }
 }

@@ -64,7 +64,7 @@ class ImageClassificationHelper(private val context: Context) {
 
     fun classifyImage(bitmap: Bitmap): String {
         if (tfLite == null) {
-            return "Model Belum Siap!"
+            return "AI Belum Siap!\n silahkan selesaikan proses download data terlebih dahulu"
         }
 
         // Ubah gambar ke format yang sesuai dengan model

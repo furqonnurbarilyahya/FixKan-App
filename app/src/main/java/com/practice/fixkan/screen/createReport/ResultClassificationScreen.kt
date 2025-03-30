@@ -1,4 +1,4 @@
-package com.practice.fixkan.screen
+package com.practice.fixkan.screen.createReport
 
 import android.Manifest
 import android.content.Context
@@ -59,7 +59,6 @@ import com.practice.fixkan.component.TopBar
 import com.practice.fixkan.data.remote.repository.MainRepository
 import com.practice.fixkan.model.ReportData
 import com.practice.fixkan.navigation.Screen
-import com.practice.fixkan.screen.createReport.ReportViewModel
 import com.practice.fixkan.ui.theme.FixKanTheme
 import com.practice.fixkan.utils.getCurrentLocation
 import kotlinx.coroutines.launch
@@ -273,7 +272,7 @@ fun ResultClassificationScreen(
                     tint = Color.Black
                 )
                 Text(
-                    text = "Simpan Koordinat",
+                    text = "Tambah Koordinat",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.Black

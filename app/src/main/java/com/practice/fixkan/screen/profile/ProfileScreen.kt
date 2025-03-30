@@ -27,15 +27,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,7 +53,6 @@ import java.util.Locale
 fun ProfileScreen(authViewModel: AuthViewModel, userPreference: UserPreference) {
     val context = LocalContext.current
     val userData by userPreference.getUserData().collectAsState(initial = null)
-    var isLocationPermissionGranted by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -111,6 +105,7 @@ fun ProfileScreen(authViewModel: AuthViewModel, userPreference: UserPreference) 
                         ProfileItem("Nama pengguna", user.user.name)
                         ProfileItem("Email", user.user.email)
                         ProfileItem("Akun dibuat sejak", formatDate(user.user.createdAt))
+                        Log.d("Profile", user.user.id)
                     }
                 }
 
@@ -128,7 +123,7 @@ fun ProfileScreen(authViewModel: AuthViewModel, userPreference: UserPreference) 
                             text = "Alamat",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = Color(0xFF276561)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         ProfileItem("Provinsi", user.user.location.province)
@@ -138,49 +133,49 @@ fun ProfileScreen(authViewModel: AuthViewModel, userPreference: UserPreference) 
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+//                Spacer(modifier = Modifier.height(16.dp))
+//
+//                Card(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    shape = RoundedCornerShape(16.dp),
+//                    elevation = CardDefaults.cardElevation(6.dp),
+//                    colors = CardDefaults.cardColors(containerColor = Color.White)
+//                ) {
+//                    Column(
+//                        modifier = Modifier.padding(16.dp)
+//                    ) {
+//                        Text(
+//                            text = "Pengaturan",
+//                            style = MaterialTheme.typography.titleLarge,
+//                            fontWeight = FontWeight.Bold,
+//                            color = Color(0xFF276561)
+//                        )
+//                        Spacer(modifier = Modifier.height(8.dp))
+//
+//                        // Baris dengan teks dan saklar
+//                        Row(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            verticalAlignment = Alignment.CenterVertically,
+//                            horizontalArrangement = Arrangement.SpaceBetween
+//                        ) {
+//                            Text(
+//                                text = "Perizinan Lokasi",
+//                                style = MaterialTheme.typography.bodyLarge,
+//                                fontWeight = FontWeight.Bold
+//                            )
+//                            Switch(
+//                                checked = isLocationPermissionGranted,
+//                                onCheckedChange = { isLocationPermissionGranted = it },
+//                                colors = SwitchDefaults.colors(
+//                                    checkedThumbColor = MaterialTheme.colorScheme.primary,
+//                                    uncheckedThumbColor = Color.Gray
+//                                )
+//                            )
+//                        }
+//                    }
+//                }
 
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(6.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = "Pengaturan",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // Baris dengan teks dan saklar
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = "Perizinan Lokasi",
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Switch(
-                                checked = isLocationPermissionGranted,
-                                onCheckedChange = { isLocationPermissionGranted = it },
-                                colors = SwitchDefaults.colors(
-                                    checkedThumbColor = MaterialTheme.colorScheme.primary,
-                                    uncheckedThumbColor = Color.Gray
-                                )
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(22.dp))
+                Spacer(modifier = Modifier.height(26.dp))
 
                 // Tombol Logout dengan desain modern
                 Button(

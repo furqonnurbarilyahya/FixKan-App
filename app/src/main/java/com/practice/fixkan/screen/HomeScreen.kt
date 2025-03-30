@@ -32,6 +32,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,13 +50,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.practice.fixkan.R
+import com.practice.fixkan.component.AutoScrollBanner
+import com.practice.fixkan.component.ComingSoonDialog
 import com.practice.fixkan.data.pref.UserPreference
 import com.practice.fixkan.ui.theme.FixKanTheme
 
 @Composable
 fun HomeScreen(navController: NavHostController, userPreference: UserPreference) {
 
+    var showDialog by remember { mutableStateOf(false) }
     val userData by userPreference.getUserData().collectAsState(initial = null)
+    val banners = listOf(
+        R.drawable.ban1,
+        R.drawable.ban2,
+    )
 
     Column(
         modifier = Modifier
@@ -140,253 +150,254 @@ fun HomeScreen(navController: NavHostController, userPreference: UserPreference)
             }
         }
 
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.banner_home),
-                contentDescription = "banner_home"
-            )
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 20.dp, start = 20.dp, end = 20.dp)
-            ) {
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    shadowElevation = 4.dp, // Memberikan efek shadow
-                    modifier = Modifier
-                        .weight(0.5f)
-                        .padding(end = 8.dp)
-                        .clickable { navController.navigate("classification") }
-                ) {
-                    Column(
-                        Modifier
-                            .wrapContentSize()
-                            .background(Color.White),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Spacer(Modifier.height(12.dp))
-                        Box(
-                            Modifier
-                                .size(55.dp)
-                                .background(
-                                    Color(android.graphics.Color.parseColor("#276561")),
-                                    shape = RoundedCornerShape(10.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_menu1),
-                                contentDescription = null,
-                                modifier = Modifier.clip(RoundedCornerShape(12.dp))
-                            )
-                        }
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp)
-                                .height(28.dp)
-                                .background(
-                                    Color(android.graphics.Color.parseColor("#276561")),
-                                    shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Buat Laporan",
-                                color = Color.White,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.W500,
-                                softWrap = true,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
-                }
+        AutoScrollBanner(banners)
 
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    shadowElevation = 4.dp,
-                    modifier = Modifier
-                        .weight(0.5f)
-                        .padding(start = 8.dp)
-                        .clickable { }
-                ) {
-                    Column(
-                        Modifier
-                            .wrapContentSize()
-                            .background(Color.White),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Spacer(Modifier.height(12.dp))
-                        Box(
-                            Modifier
-                                .size(55.dp)
-                                .background(
-                                    Color(android.graphics.Color.parseColor("#276561")),
-                                    shape = RoundedCornerShape(10.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_menu2),
-                                contentDescription = null,
-                                modifier = Modifier.clip(RoundedCornerShape(12.dp))
-                            )
-                        }
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp)
-                                .height(28.dp)
-                                .background(
-                                    Color(android.graphics.Color.parseColor("#276561")),
-                                    shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Statistik",
-                                color = Color.White,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.W500,
-                                softWrap = true,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
-                }
-            }
-
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 20.dp, start = 20.dp, end = 20.dp)
-            ) {
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    shadowElevation = 4.dp, // Memberikan efek shadow
-                    modifier = Modifier
-                        .weight(0.5f)
-                        .padding(end = 8.dp)
-                        .clickable { }
-                ) {
-                    Column(
-                        Modifier
-                            .wrapContentSize()
-                            .background(Color.White),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Spacer(Modifier.height(12.dp))
-                        Box(
-                            Modifier
-                                .size(55.dp)
-                                .background(
-                                    Color(android.graphics.Color.parseColor("#276561")),
-                                    shape = RoundedCornerShape(10.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_menu3),
-                                contentDescription = null,
-                                modifier = Modifier.clip(RoundedCornerShape(12.dp))
-                            )
-                        }
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp)
-                                .height(28.dp)
-                                .background(
-                                    Color(android.graphics.Color.parseColor("#276561")),
-                                    shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Riwayat Laporan",
-                                color = Color.White,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.W500,
-                                softWrap = true,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
-                }
-
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    shadowElevation = 4.dp,
-                    modifier = Modifier
-                        .weight(0.5f)
-                        .padding(start = 8.dp)
-                        .clickable { }
-                ) {
-                    Column(
-                        Modifier
-                            .wrapContentSize()
-                            .background(Color.White),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Spacer(Modifier.height(12.dp))
-                        Box(
-                            Modifier
-                                .size(55.dp)
-                                .background(
-                                    Color(android.graphics.Color.parseColor("#276561")),
-                                    shape = RoundedCornerShape(10.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_menu4),
-                                contentDescription = null,
-                                modifier = Modifier.clip(RoundedCornerShape(12.dp))
-                            )
-                        }
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp)
-                                .height(28.dp)
-                                .background(
-                                    Color(android.graphics.Color.parseColor("#276561")),
-                                    shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Mode Relawan",
-                                color = Color.White,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.W500,
-                                softWrap = true,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
-                }
-            }
-
-        }
         Spacer(Modifier.height(16.dp))
+
         Text(
-            modifier = Modifier.padding(horizontal = 14.dp),
-            text = "Tips Pengunaan Aplikasi",
-            fontSize = 20.sp,
+            modifier = Modifier.padding(horizontal = 20.dp),
+            text = "Fitur Tersedia",
+            fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold
         )
-        Spacer(Modifier.height(16.dp))
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp, start = 20.dp, end = 20.dp)
+        ) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                shadowElevation = 4.dp, // Memberikan efek shadow
+                modifier = Modifier
+                    .weight(0.5f)
+                    .padding(end = 8.dp)
+                    .clickable { navController.navigate("classification") }
+            ) {
+                Column(
+                    Modifier
+                        .wrapContentSize()
+                        .background(Color.White),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(Modifier.height(12.dp))
+                    Box(
+                        Modifier
+                            .size(55.dp)
+                            .background(
+                                Color(android.graphics.Color.parseColor("#276561")),
+                                shape = RoundedCornerShape(10.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_menu1),
+                            contentDescription = null,
+                            modifier = Modifier.clip(RoundedCornerShape(12.dp))
+                        )
+                    }
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                            .height(28.dp)
+                            .background(
+                                Color(android.graphics.Color.parseColor("#2a7974")),
+                                shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Unggah Laporan",
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.W500,
+                            softWrap = true,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
+
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                shadowElevation = 4.dp,
+                modifier = Modifier
+                    .weight(0.5f)
+                    .padding(start = 8.dp)
+                    .clickable {
+                        navController.navigate("statistics")
+                    }
+            ) {
+                Column(
+                    Modifier
+                        .wrapContentSize()
+                        .background(Color.White),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(Modifier.height(12.dp))
+                    Box(
+                        Modifier
+                            .size(55.dp)
+                            .background(
+                                Color(android.graphics.Color.parseColor("#276561")),
+                                shape = RoundedCornerShape(10.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_menu2),
+                            contentDescription = null,
+                            modifier = Modifier.clip(RoundedCornerShape(12.dp))
+                        )
+                    }
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                            .height(28.dp)
+                            .background(
+                                Color(android.graphics.Color.parseColor("#2a7974")),
+                                shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Rekapitulasi",
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.W500,
+                            softWrap = true,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
+        }
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp, start = 20.dp, end = 20.dp)
+        ) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                shadowElevation = 4.dp, // Memberikan efek shadow
+                modifier = Modifier
+                    .weight(0.5f)
+                    .padding(end = 8.dp)
+                    .clickable { navController.navigate("history_report") }
+            ) {
+                Column(
+                    Modifier
+                        .wrapContentSize()
+                        .background(Color.White),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(Modifier.height(12.dp))
+                    Box(
+                        Modifier
+                            .size(55.dp)
+                            .background(
+                                Color(android.graphics.Color.parseColor("#276561")),
+                                shape = RoundedCornerShape(10.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_menu3),
+                            contentDescription = null,
+                            modifier = Modifier.clip(RoundedCornerShape(12.dp))
+                        )
+                    }
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                            .height(28.dp)
+                            .background(
+                                Color(android.graphics.Color.parseColor("#2a7974")),
+                                shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Riwayat Laporan",
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.W500,
+                            softWrap = true,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
+
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                shadowElevation = 4.dp,
+                modifier = Modifier
+                    .weight(0.5f)
+                    .padding(start = 8.dp)
+                    .clickable { showDialog = true }
+            ) {
+                Column(
+                    Modifier
+                        .wrapContentSize()
+                        .background(Color.White),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(Modifier.height(12.dp))
+                    Box(
+                        Modifier
+                            .size(55.dp)
+                            .background(
+                                Color(android.graphics.Color.parseColor("#276561")),
+                                shape = RoundedCornerShape(10.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_menu4),
+                            contentDescription = null,
+                            modifier = Modifier.clip(RoundedCornerShape(12.dp))
+                        )
+                    }
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                            .height(28.dp)
+                            .background(
+                                Color(android.graphics.Color.parseColor("#2a7974")),
+                                shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Mode Relawan",
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.W500,
+                            softWrap = true,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
+        }
+        Spacer(Modifier.height(20.dp))
+        Text(
+            modifier = Modifier.padding(horizontal = 20.dp),
+            text = "Tips Pengunaan Aplikasi",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+        Spacer(Modifier.height(14.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 14.dp)
+                .padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
         ) {
             Card(
                 shape = RoundedCornerShape(12.dp),
@@ -394,8 +405,10 @@ fun HomeScreen(navController: NavHostController, userPreference: UserPreference)
                 modifier = Modifier
                     .height(160.dp)
                     .width(240.dp)
-                    .clickable { },
-                colors = CardDefaults.cardColors(Color(android.graphics.Color.parseColor("#276561"))),
+                    .clickable {
+                        navController.navigate("tips_a")
+                    },
+                colors = CardDefaults.cardColors(Color.White),
             ) {
                 Column(
                     Modifier.fillMaxSize(),
@@ -406,16 +419,17 @@ fun HomeScreen(navController: NavHostController, userPreference: UserPreference)
                             .height(120.dp)
                             .background(Color.Gray)
                     ) {
-//                        Image(
-//                            painter = painterResource(id = R.drawable.ic_menu4),
-//                            contentDescription = null
-//                        )
+                        Image(
+                            painter = painterResource(id = R.drawable.tips2),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize()
+                        )
                     }
                     Text(
                         modifier = Modifier.padding(start = 14.dp, end = 14.dp, top = 6.dp),
-                        text = "Cara Membuat Laporan",
+                        text = "Cara membuat laporan",
                         fontSize = 16.sp,
-                        color = Color.White,
+                        color = Color.Black,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -427,8 +441,10 @@ fun HomeScreen(navController: NavHostController, userPreference: UserPreference)
                 modifier = Modifier
                     .height(160.dp)
                     .width(240.dp)
-                    .clickable { },
-                colors = CardDefaults.cardColors(Color(android.graphics.Color.parseColor("#276561"))),
+                    .clickable {
+                        navController.navigate("tips_b")
+                    },
+                colors = CardDefaults.cardColors(Color.White),
             ) {
                 Column(
                     Modifier.fillMaxSize(),
@@ -439,16 +455,17 @@ fun HomeScreen(navController: NavHostController, userPreference: UserPreference)
                             .height(120.dp)
                             .background(Color.White)
                     ) {
-//                        Image(
-//                            painter = painterResource(id = R.drawable.ic_menu4),
-//                            contentDescription = null
-//                        )
+                        Image(
+                            painter = painterResource(id = R.drawable.tips1),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize()
+                        )
                     }
                     Text(
                         modifier = Modifier.padding(start = 14.dp, end = 14.dp, top = 6.dp),
-                        text = "AI Salah Deteksi Laporan?",
+                        text = "Solusi Model Belum Siap",
                         fontSize = 16.sp,
-                        color = Color.White,
+                        color = Color.Black,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -460,8 +477,10 @@ fun HomeScreen(navController: NavHostController, userPreference: UserPreference)
                 modifier = Modifier
                     .height(160.dp)
                     .width(240.dp)
-                    .clickable { },
-                colors = CardDefaults.cardColors(Color(android.graphics.Color.parseColor("#276561"))),
+                    .clickable {
+                        navController.navigate("tips_c")
+                    },
+                colors = CardDefaults.cardColors(Color.White),
             ) {
                 Column(
                     Modifier.fillMaxSize(),
@@ -472,53 +491,24 @@ fun HomeScreen(navController: NavHostController, userPreference: UserPreference)
                             .height(120.dp)
                             .background(Color.White)
                     ) {
-//                        Image(
-//                            painter = painterResource(id = R.drawable.ic_menu4),
-//                            contentDescription = null
-//                        )
+                        Image(
+                            painter = painterResource(id = R.drawable.tips3),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize()
+                        )
                     }
                     Text(
                         modifier = Modifier.padding(start = 14.dp, end = 14.dp, top = 6.dp),
-                        text = "Cara Membuat Laporan",
+                        text = "Hal yang harus dihindari",
                         fontSize = 16.sp,
-                        color = Color.White,
+                        color = Color.Black,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
             }
-            Spacer(Modifier.width(14.dp))
-            Card(
-                shape = RoundedCornerShape(12.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                modifier = Modifier
-                    .height(160.dp)
-                    .width(240.dp)
-                    .clickable { },
-                colors = CardDefaults.cardColors(Color(android.graphics.Color.parseColor("#276561"))),
-            ) {
-                Column(
-                    Modifier.fillMaxSize(),
-                ) {
-                    Box(
-                        Modifier
-                            .width(240.dp)
-                            .height(120.dp)
-                            .background(Color.White)
-                    ) {
-//                        Image(
-//                            painter = painterResource(id = R.drawable.ic_menu4),
-//                            contentDescription = null
-//                        )
-                    }
-                    Text(
-                        modifier = Modifier.padding(start = 14.dp, end = 14.dp, top = 6.dp),
-                        text = "Cara Membuat Laporan",
-                        fontSize = 16.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
+        }
+        if (showDialog) {
+            ComingSoonDialog ( onDismiss = { showDialog = false } )
         }
     }
 }

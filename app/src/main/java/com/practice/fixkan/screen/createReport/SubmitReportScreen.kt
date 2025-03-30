@@ -1,4 +1,4 @@
-package com.practice.fixkan.screen
+package com.practice.fixkan.screen.createReport
 
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -63,7 +63,6 @@ import com.practice.fixkan.data.pref.UserPreference
 import com.practice.fixkan.data.remote.repository.MainRepository
 import com.practice.fixkan.model.ReportData
 import com.practice.fixkan.navigation.Screen
-import com.practice.fixkan.screen.createReport.ReportViewModel
 import com.practice.fixkan.ui.theme.FixKanTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -341,7 +340,7 @@ fun SubmitReportScreen(
                             }
 
                             !isValidRegency -> coroutineScope.launch {
-                                snackbarHostState.showSnackbar("Nama Kabupaten tidak valid!")
+                                snackbarHostState.showSnackbar("Nama Kabupaten/Kota tidak valid!")
                             }
 
                             !isValidDistrict -> coroutineScope.launch {
@@ -349,7 +348,7 @@ fun SubmitReportScreen(
                             }
 
                             !isValidVillage -> coroutineScope.launch {
-                                snackbarHostState.showSnackbar("Nama Desa tidak valid!")
+                                snackbarHostState.showSnackbar("Nama Kelurahan/Desa tidak valid!")
                             }
 
                             else -> {

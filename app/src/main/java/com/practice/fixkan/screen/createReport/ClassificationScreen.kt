@@ -1,4 +1,4 @@
-package com.practice.fixkan.screen
+package com.practice.fixkan.screen.createReport
 
 import android.content.ContentValues
 import android.content.Context
@@ -283,7 +283,7 @@ fun ClassificationScreen(navController: NavController) {
     }
     LaunchedEffect(showDialog) {
         if (showDialog && imageUri != null) {
-            delay(3000)
+            delay(4000)
 
             Log.d("UriFromCamera", "$imageUri")
             imageBitmap?.let {
