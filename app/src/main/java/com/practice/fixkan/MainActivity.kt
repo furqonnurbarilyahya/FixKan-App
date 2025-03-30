@@ -16,11 +16,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
@@ -40,6 +42,7 @@ import com.practice.fixkan.data.remote.retrofit.ApiConfig
 import com.practice.fixkan.navigation.NavigationItem
 import com.practice.fixkan.navigation.Screen
 import com.practice.fixkan.screen.ClassificationScreen
+import com.practice.fixkan.screen.DetailReportScreen
 import com.practice.fixkan.screen.HomeScreen
 import com.practice.fixkan.screen.ResultClassificationScreen
 import com.practice.fixkan.screen.SubmitReportScreen
@@ -82,6 +85,7 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
     val listReportViewModel: ListReportViewModel = viewModel(factory = MainViewModelFactory(reportRepository))
     val statisticViewModel: StatisticViewModel = viewModel(factory = MainViewModelFactory(reportRepository))
 
+
     val systemUiController = rememberSystemUiController()
 
     SideEffect {
@@ -111,7 +115,15 @@ fun FixKanApp(navController: NavHostController = rememberNavController()) {
                 HomeScreen(navController = navController, userPreference)
             }
             composable(Screen.Report.route) {
-                ListReportScreen(context, listReportViewModel, reportRepository)
+                ListReportScreen(context, listReportViewModel, reportRepository, navController)
+            }
+            composable(Screen.DetailReport.route) {
+                val laporan by listReportViewModel.selectedReport.collectAsState()
+                laporan?.let {
+                    DetailReportScreen(it, navController)
+                } ?: run {
+                    Text("Laporan Tidak Ditemukan", modifier = Modifier.fillMaxSize(), textAlign = TextAlign.Center)
+                }
             }
             composable(Screen.Classification.route) {
                 ClassificationScreen(navController)

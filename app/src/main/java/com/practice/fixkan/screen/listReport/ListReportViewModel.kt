@@ -53,4 +53,11 @@ class ListReportViewModel(private val repository: MainRepository) : ViewModel() 
             )
         }
     }
+
+    private val _selectedReport = MutableStateFlow<DataItem?>(null)
+    val selectedReport: StateFlow<DataItem?> = _selectedReport
+
+    fun selectReport(reportItem: DataItem) {
+        _selectedReport.value = reportItem
+    }
 }
