@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -313,7 +312,6 @@ fun ListReportScreen(
 fun ListReportItem(
     context: Context,
     reportItem: List<DataItem>,
-//    navigateToReportDetail: (String) -> Unit,
     navController: NavController,
     searchQuery: String,
     listReportViewModel: ListReportViewModel = viewModel(
@@ -423,29 +421,6 @@ fun ListReportItem(
                             )
 
                             Spacer(modifier = Modifier.height(6.dp))
-
-                            // Baris 1: Latitude & Longitude
-//                            Row(verticalAlignment = Alignment.CenterVertically) {
-//                                Icon(
-//                                    imageVector = Icons.Outlined.LocationOn,
-//                                    contentDescription = "Coordinates",
-//                                    tint = Color(0xFF388E3C),
-//                                    modifier = Modifier.size(16.dp)
-//                                )
-//                                Spacer(modifier = Modifier.width(6.dp))
-//                                Column {
-//                                    Text(
-//                                        text = "Lat: ${it.latitude}",
-//                                        fontSize = 12.sp,
-//                                        color = Color.Gray
-//                                    )
-//                                    Text(
-//                                        text = "Long: ${it.longitude}",
-//                                        fontSize = 12.sp,
-//                                        color = Color.Gray
-//                                    )
-//                                }
-//                            }
 
                             Spacer(modifier = Modifier.height(4.dp))
 
