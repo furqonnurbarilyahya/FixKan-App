@@ -39,3 +39,11 @@ FixKan dikembangkan dengan teknologi terbaru untuk memastikan pengalaman penggun
 - ![Coil](https://img.shields.io/badge/Coil-34A853?logo=android&logoColor=white&style=flat)
 - ![Firebase ML](https://img.shields.io/badge/Firebase%20ML-FF6D00?logo=firebase&logoColor=white&style=flat)
 - ![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?logo=tensorflow&logoColor=white&style=flat)
+
+
+---
+
+## 🤖 Model AI
+Bagian ini menyertakan folder yang berisi file model AI yang digunakan dalam proyek ini.
+
+Link: https://drive.google.com/drive/folders/1an-KrjESdQqi8ne0DxbZjsnBp6tr3B1W?usp=sharing
